@@ -36,6 +36,10 @@ public class TeamEntity extends BaseEntity {
     private String name;
 
     @Getter @Setter
+    @Column(nullable = false)
+    private Integer teamSize;
+
+    @Getter @Setter
     private Integer numberOfWins;
 
     @Getter @Setter
@@ -43,6 +47,7 @@ public class TeamEntity extends BaseEntity {
     @JoinColumn(name = "captain_id", nullable = false)
     private UserEntity captain;
 
+    @Getter
     @ManyToMany
     @JoinTable(
             name = "team_member",
