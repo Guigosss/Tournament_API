@@ -1,0 +1,75 @@
+erDiagram
+    USER {
+        int id PK
+        string username
+        string email
+        string password
+    }
+
+    ROLE {
+        int id PK
+        string name
+    }
+
+    TOURNAMENT {
+        int id PK
+        string name
+        string description
+        int maxParticipants
+        TournamentFormat format
+        TournamentStatus status
+        date startDate
+        date registationStartDate
+        date registrationEndDate
+    }
+
+    TEAM {
+        int id PK
+        string name
+        int numberOfWins
+    }
+
+    PARTICIPANT {
+        int id PK
+    }
+
+    PHASE {
+        int id PK
+        PhaseType type
+        int orderIndex
+    }
+
+    ROUND {
+        int id PK
+        RoundType type
+        int orderIndex
+    }
+
+    MATCH {
+        int id PK
+        int score1
+        int score2
+        string status
+        datetime scheduleDate
+    }
+
+%% Relations
+    ROLE ||--o{ USER : "HAS_ROLE"
+    USER ||--o{ TOURNAMENT : "ORGANIZE"
+    USER ||--o{ TEAM : "LEAD"
+    USER }o--o{ TEAM : "JOIN"
+
+    USER }o--o{ TOURNAMENT : "REGISTER_USER"
+    TEAM }o--o{ TOURNAMENT : "REGISTER_TEAM"
+
+    TOURNAMENT ||--o{ PARTICIPANT : "PARTICIPATE"
+    USER |o--o{ PARTICIPANT : "PARTICIPATE_USER"
+    TEAM |o--o{ PARTICIPANT : "PARTICIPATE_TEAM"
+
+    TOURNAMENT ||--o{ PHASE : "COMPOSE"
+    PHASE ||--o{ ROUND : "CONTAIN"
+    ROUND ||--o{ MATCH : "GENERATE"
+
+    PARTICIPANT |o--o{ MATCH : "WIN"
+    PARTICIPANT ||--o{ MATCH : "PARTICIPANT_1"
+    PARTICIPANT ||--o{ MATCH : "PARTICIPANT_2"
