@@ -15,7 +15,7 @@ import lombok.ToString;
 import lombok.Getter;
 
 @Entity
-@Table(name = "paticipant")
+@Table(name = "participant")
 @NoArgsConstructor @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false) @ToString
 public class ParticipantEntity {

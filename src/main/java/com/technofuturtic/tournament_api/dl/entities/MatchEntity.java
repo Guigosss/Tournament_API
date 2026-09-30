@@ -34,11 +34,11 @@ public class MatchEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "participant1_id", nullable = false)
-    private TournamentEntity participant1;
+    private ParticipantEntity participant1;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "participant2_id", nullable = false)
-    private TournamentEntity participant2;
+    private ParticipantEntity participant2;
 
     @Getter @Setter
     @Column(nullable = false)
