@@ -29,39 +29,29 @@ public class PhaseGenerator {
     }
 
     private List<PhaseEntity> generateSingleElimination(TournamentEntity tournament) {
-        PhaseEntity elimination = new PhaseEntity();
-        elimination.setType(PhaseType.ELIMINATION);
-        elimination.setOrderIndex(1);
-        elimination.setTournament(tournament);
-
-        return List.of(elimination);
+        return List.of(newPhase(tournament, PhaseType.ELIMINATION, 1));
     }
 
     private List<PhaseEntity> generateDoubleElimination(TournamentEntity tournament) {
-        PhaseEntity elimination = new PhaseEntity();
-        elimination.setType(PhaseType.ELIMINATION);
-        elimination.setOrderIndex(1);
-        elimination.setTournament(tournament);
-
-        PhaseEntity losers = new PhaseEntity();
-        losers.setType(PhaseType.LOSERS_BRACKET);
-        losers.setOrderIndex(2);
-        losers.setTournament(tournament);
-
-        return List.of(elimination, losers);
+        return List.of(
+                newPhase(tournament, PhaseType.ELIMINATION, 1),
+                newPhase(tournament, PhaseType.LOSERS_BRACKET, 2)
+        );
     }
 
     private List<PhaseEntity> generateGroupsThenPlayoff(TournamentEntity tournament) {
-        PhaseEntity groups = new PhaseEntity();
-        groups.setType(PhaseType.GROUP_STAGE);
-        groups.setOrderIndex(1);
-        groups.setTournament(tournament);
+        return List.of(
+                newPhase(tournament, PhaseType.GROUP_STAGE, 1),
+                newPhase(tournament, PhaseType.ELIMINATION, 2)
+        );
+    }
 
-        PhaseEntity playoffs = new PhaseEntity();
-        playoffs.setType(PhaseType.ELIMINATION);
-        playoffs.setOrderIndex(2);
-        playoffs.setTournament(tournament);
+    private PhaseEntity newPhase(TournamentEntity tournament, PhaseType type, int orderIndex) {
+        PhaseEntity phase = new PhaseEntity();
+        phase.setType(type);
+        phase.setOrderIndex(orderIndex);
+        phase.setTournament(tournament);
 
-        return List.of(groups, playoffs);
+        return phase;
     }
 }
