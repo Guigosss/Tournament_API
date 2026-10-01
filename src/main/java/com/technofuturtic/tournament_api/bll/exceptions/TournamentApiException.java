@@ -6,7 +6,7 @@ import lombok.ToString;
 import org.springframework.http.HttpStatus;
 
 @EqualsAndHashCode(callSuper = false) @ToString
-public abstract class IntroSpringApiException extends RuntimeException {
+public abstract class TournamentApiException extends RuntimeException {
 
     @Getter
     private String section;
@@ -17,7 +17,7 @@ public abstract class IntroSpringApiException extends RuntimeException {
     @Getter
     private final Object body;
 
-    public IntroSpringApiException(HttpStatus status, Object body, String section) {
+    public TournamentApiException(HttpStatus status, Object body, String section) {
         super();
         this.status = status;
         this.body = body;

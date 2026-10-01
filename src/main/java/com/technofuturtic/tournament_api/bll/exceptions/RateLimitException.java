@@ -2,7 +2,7 @@ package com.technofuturtic.tournament_api.bll.exceptions;
 
 import org.springframework.http.HttpStatus;
 
-public class RateLimitException extends IntroSpringApiException {
+public class RateLimitException extends TournamentApiException {
 
     private final int remainingTokens;
     private final long retryAfterSeconds;

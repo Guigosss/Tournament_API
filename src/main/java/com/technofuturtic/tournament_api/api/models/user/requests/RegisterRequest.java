@@ -10,6 +10,9 @@ public record RegisterRequest(
         @Size(max = 50, message = "Username max 50 chars")
         String username,
 
+        @NotBlank(message = "Email is required")
+        String email,
+
         @NotBlank(message = "Password is required")
         String password
 ) {
@@ -17,6 +20,7 @@ public record RegisterRequest(
     public UserEntity toUser() {
         return new UserEntity(
                 username,
+                email,
                 password
         );
     }

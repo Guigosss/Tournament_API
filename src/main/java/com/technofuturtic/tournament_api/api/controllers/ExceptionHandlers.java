@@ -1,13 +1,11 @@
 package com.technofuturtic.tournament_api.api.controllers;
 
-import com.technofuturtic.tournament_api.bll.exceptions.IntroSpringApiException;
+import com.technofuturtic.tournament_api.bll.exceptions.TournamentApiException;
 import com.technofuturtic.tournament_api.bll.exceptions.RateLimitException;
 import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.query.sqm.PathElementException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.dao.NonTransientDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,10 +41,10 @@ public class ExceptionHandlers {
                 ));
     }
 
-    @ExceptionHandler(value = IntroSpringApiException.class)
-    public ResponseEntity<?> handleIntroSpringApiException(IntroSpringApiException ex) {
+    @ExceptionHandler(value = TournamentApiException.class)
+    public ResponseEntity<?> handleTournamentApiException(TournamentApiException ex) {
 
-        log.error("IntroSpringApiException: {}", ex.getMessage(), ex);
+        log.error("TournamentApiException: {}", ex.getMessage(), ex);
         log.warn("Attention");
         log.info("Info");
 
