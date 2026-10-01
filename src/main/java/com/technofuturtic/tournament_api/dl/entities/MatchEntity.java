@@ -1,5 +1,6 @@
 package com.technofuturtic.tournament_api.dl.entities;
 
+import com.technofuturtic.tournament_api.dl.enums.MatchStatus;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
@@ -9,6 +10,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -28,14 +31,17 @@ public class MatchEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Getter @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "round_id", nullable = false)
     private RoundEntity round;
 
+    @Getter @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "participant1_id", nullable = false)
     private ParticipantEntity participant1;
 
+    @Getter @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "participant2_id", nullable = false)
     private ParticipantEntity participant2;
@@ -48,15 +54,16 @@ public class MatchEntity {
     @Column(nullable = false)
     private Integer score2;
 
+    @Getter @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "winner_id")
     private ParticipantEntity winner;
 
     @Getter @Setter
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String status; //- Enum
+    private MatchStatus status;
 
     @Getter @Setter
-    @Column(nullable = false)
-    private LocalDate schedulteDate;
+    private LocalDate scheduledDate;
 }

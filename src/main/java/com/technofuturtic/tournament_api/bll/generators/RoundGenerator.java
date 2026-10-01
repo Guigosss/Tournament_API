@@ -1,5 +1,6 @@
 package com.technofuturtic.tournament_api.bll.generators;
 
+import com.technofuturtic.tournament_api.bll.exceptions.engine.round.EliminationParticipantCountOutOfRangeException;
 import com.technofuturtic.tournament_api.dal.repositories.RoundRepository;
 import com.technofuturtic.tournament_api.dl.entities.PhaseEntity;
 import com.technofuturtic.tournament_api.dl.entities.RoundEntity;
@@ -19,19 +20,18 @@ public class RoundGenerator {
 
     private final RoundRepository roundRepository;
 
-    public void generate(PhaseEntity phase, int participantCount) {
+    public List<RoundEntity> generate(PhaseEntity phase, int participantCount) {
         List<RoundEntity> rounds = switch (phase.getType()) {
             case ELIMINATION -> generateElimination(phase, participantCount);
             case GROUP_STAGE, LOSERS_BRACKET -> List.of(); // TODO
         };
 
-        roundRepository.saveAll(rounds);
+        return roundRepository.saveAll(rounds);
     }
 
     private List<RoundEntity> generateElimination(PhaseEntity phase, int participantCount) {
-        if (participantCount < MIN_PARTICIPANTS || participantCount > MAX_PARTICIPANTS ) {
-            throw new IllegalArgumentException("An elimination phase requires between %d and %d participants."
-                    .formatted(MIN_PARTICIPANTS, MAX_PARTICIPANTS));
+        if (participantCount < MIN_PARTICIPANTS || participantCount > MAX_PARTICIPANTS) {
+            throw new EliminationParticipantCountOutOfRangeException(MIN_PARTICIPANTS, MAX_PARTICIPANTS);
         }
 
         //- Next exponent 2
