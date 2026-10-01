@@ -29,20 +29,21 @@ public class Seed implements CommandLineRunner {
             roleRepository.save(userRole);
             roleRepository.save(adminRole);
 
-            String email = "test@test.be";
+            String emailUser = "user@test.be";
+            String emailAdmin = "admin@test.be";
 
             String password = passwordEncoder.encode("Test1234=");
 
             List<UserEntity> users = List.of(
                     new UserEntity(
                             "user",
-                            email,
+                            emailUser,
                             password,
                             userRole
                     ),
                     new UserEntity(
                             "admin",
-                            email,
+                            emailAdmin,
                             password,
                             adminRole
                     )
