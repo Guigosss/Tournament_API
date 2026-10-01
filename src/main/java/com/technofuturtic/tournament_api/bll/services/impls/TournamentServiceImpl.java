@@ -2,6 +2,8 @@ package com.technofuturtic.tournament_api.bll.services.impls;
 
 import com.technofuturtic.tournament_api.api.models.tournament.requests.TournamentRequest;
 import com.technofuturtic.tournament_api.api.models.tournament.responses.TournamentReponse;
+import com.technofuturtic.tournament_api.bll.exceptions.tournament.TournamentNotFoundException;
+import com.technofuturtic.tournament_api.bll.exceptions.user.UserNotFoundException;
 import com.technofuturtic.tournament_api.bll.services.TournamentService;
 import com.technofuturtic.tournament_api.dal.repositories.TournamentRepository;
 import com.technofuturtic.tournament_api.dal.repositories.UserRepository;
@@ -21,13 +23,15 @@ public class TournamentServiceImpl implements TournamentService {
     private final TournamentRepository tournamentRepository;
     private final UserRepository userRepository;
 
+
+    //Création d'un tournament
     @Override
     @Transactional
     public TournamentReponse create(TournamentRequest request){
         validateDates(request);
 
         UserEntity organizer = userRepository.findById(request.organizerId())
-                .orElseThrow();
+                .orElseThrow(() -> new UserNotFoundException("Organisateur non trouvé, Id : " + request.organizerId()));
 
         TournamentEntity tournament = new TournamentEntity();
         tournament.setName(request.name());
@@ -45,6 +49,7 @@ public class TournamentServiceImpl implements TournamentService {
         return TournamentReponse.fromEntity(tournamentRepository.save(tournament));
     }
 
+    //Vérification des dates
     @Override
     public void validateDates(TournamentRequest request) {
         if (request.endDate().isBefore(request.startDate())) {
@@ -59,13 +64,15 @@ public class TournamentServiceImpl implements TournamentService {
 
     }
 
+    //Récupération d'un tournament avec l'ID
     @Override
     public TournamentReponse getById(Integer id) {
         return tournamentRepository.findById(id)
                 .map(TournamentReponse::fromEntity)
-                .orElseThrow();
+                .orElseThrow(() -> new TournamentNotFoundException("Tournament non trouvé, Id : " + id));
     }
 
+    //Récupération d'une liste avec tous les tournament
     @Override
     public List<TournamentReponse> getAll(TournamentStatus status) {
         List<TournamentEntity> tournaments = (status == null)
@@ -77,10 +84,11 @@ public class TournamentServiceImpl implements TournamentService {
                 .toList();
     }
 
+    //Mise à jour d'un tournament
     @Override
     public TournamentReponse update(Integer id, TournamentRequest request) {
         TournamentEntity tournament = tournamentRepository.findById(id)
-                .orElseThrow();
+                .orElseThrow(() -> new TournamentNotFoundException("Tournament non trouvé, Id : " + id));
 
         TournamentStatus status = tournament.getStatus();
         if (status == TournamentStatus.IN_PROGRESS
@@ -104,10 +112,11 @@ public class TournamentServiceImpl implements TournamentService {
         return TournamentReponse.fromEntity(tournamentRepository.save(tournament));
     }
 
+    //Mettre un tournament en statut CANCELED
     @Override
     public TournamentReponse cancel(Integer id) {
         TournamentEntity tournament = tournamentRepository.findById(id)
-                .orElseThrow();
+                .orElseThrow(() -> new TournamentNotFoundException("Tournament non trouvé, Id : " + id));
 
         TournamentStatus status = tournament.getStatus();
         if (status == TournamentStatus.IN_PROGRESS

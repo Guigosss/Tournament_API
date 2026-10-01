@@ -18,6 +18,7 @@ public class TournamentController {
 
     private final TournamentService tournamentService;
 
+    //Création d'un tournament
     @PostMapping
     public ResponseEntity<TournamentReponse> create(
             @Valid
@@ -27,6 +28,7 @@ public class TournamentController {
         return ResponseEntity.ok(created);
     }
 
+    //Information d'un tournament par Id
     @GetMapping("/{id}")
     public ResponseEntity<TournamentReponse> getById(
             @PathVariable Integer id
@@ -34,6 +36,7 @@ public class TournamentController {
         return ResponseEntity.ok(tournamentService.getById(id));
     }
 
+    //Liste de tous les tournaments
     @GetMapping
     public ResponseEntity<List<TournamentReponse>> getAll(
             @RequestParam(required = false) TournamentStatus status
@@ -41,6 +44,7 @@ public class TournamentController {
         return ResponseEntity.ok(tournamentService.getAll(status));
     }
 
+    //Mise à jour d'un tournament par Id
     @PutMapping({"/{id}"})
     public ResponseEntity<TournamentReponse> update(
             @PathVariable Integer id,
@@ -50,6 +54,7 @@ public class TournamentController {
         return ResponseEntity.ok(tournamentService.update(id, request));
     }
 
+    //Met un tournament en statut CANCELED
     @DeleteMapping("/{id}")
     public ResponseEntity<TournamentReponse> cancel(
             @PathVariable Integer id

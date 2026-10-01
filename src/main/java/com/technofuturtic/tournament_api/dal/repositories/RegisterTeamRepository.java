@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RegisterTeamRepository extends JpaRepository<RegisterTeamEntity, Integer> {
@@ -17,4 +18,6 @@ public interface RegisterTeamRepository extends JpaRepository<RegisterTeamEntity
     List<RegisterTeamEntity> findByTournamentId(Integer tournamentId);
 
     long countByTournamentIdAndStatusNot(Integer tournamentId, RegistrationStatus status);
+
+    Optional<RegisterTeamEntity> findByTeamIdAndTournamentId(Integer teamId, Integer tournamentId);
 }
