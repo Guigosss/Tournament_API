@@ -58,7 +58,6 @@ public class AuthController {
     }
 
     @RateLimit(maxRequests = 10, windowSeconds = 60)
-    @PreAuthorize("isAnonymous()")
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(
             @Valid @RequestBody RefreshTokenRequest request
@@ -69,7 +68,7 @@ public class AuthController {
 
         UserContext userContext = jwtUtils.getUser(request.refreshToken());
 
-        UserEntity user = (UserEntity) authService.loadUserByUsername(userContext.username());
+        UserEntity user = authService.findById(userContext.id());
 
         String newAccessToken = jwtUtils.generateToken(user);
 

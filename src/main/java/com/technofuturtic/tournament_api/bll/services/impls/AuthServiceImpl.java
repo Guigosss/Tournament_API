@@ -1,5 +1,6 @@
 package com.technofuturtic.tournament_api.bll.services.impls;
 
+import java.util.Map;
 import com.technofuturtic.tournament_api.bll.exceptions.role.RoleNotFoundException;
 import com.technofuturtic.tournament_api.bll.exceptions.user.UserAlreadyExistException;
 import com.technofuturtic.tournament_api.bll.exceptions.user.UserInvalidPasswordException;
@@ -29,6 +30,9 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
         if(userRepository.existsByUsername(user.getUsername())) {
             throw new UserAlreadyExistException();
         }
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new UserAlreadyExistException(Map.of("email", "Email already exists"));
+        }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
@@ -37,7 +41,7 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
 
         user.setRole(role);
 
-        return userRepository.save(user);
+        return userRepository.saveAndFlush(user);
     }
 
     @Override
@@ -56,7 +60,13 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        return (UserDetails) userRepository.findByUsername(username)
+        return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User with username " + username + " not found"));
+    }
+
+    @Override
+    public UserEntity findById(Integer id) {
+        return userRepository.findWithRoleById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 }

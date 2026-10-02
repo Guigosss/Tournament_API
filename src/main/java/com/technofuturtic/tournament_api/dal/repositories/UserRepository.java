@@ -12,6 +12,13 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
 
     boolean existsByUsername(String username);
 
-    @Query("select u from UserEntity u join fetch u.role where u.username ilike :username")
+    boolean existsByEmail(String email);
+
+    boolean existsByUsernameAndIdNot(String username, Integer id);
+
+    @Query("select u from UserEntity u join fetch u.role where u.id = :id")
+    Optional<UserEntity> findWithRoleById(Integer id);
+
+    @Query("select u from UserEntity u join fetch u.role where u.username = :username")
     Optional<UserEntity> findByUsername(String username);
 }

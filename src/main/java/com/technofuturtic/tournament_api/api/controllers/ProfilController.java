@@ -1,5 +1,6 @@
 package com.technofuturtic.tournament_api.api.controllers;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import com.technofuturtic.tournament_api.api.models.profil.requests.ProfilRequest;
 import com.technofuturtic.tournament_api.api.models.profil.responses.ProfilResponse;
 import com.technofuturtic.tournament_api.bll.services.ProfilService;
@@ -29,6 +30,7 @@ public class ProfilController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('admin') or principal.id() == #id")
     public ResponseEntity<Void> update(
             @PathVariable Integer id,
             @Valid @RequestBody ProfilRequest profilRequest
@@ -41,6 +43,7 @@ public class ProfilController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('admin') or principal.id() == #id")
     public ResponseEntity<Void> delete(
             @PathVariable Integer id
     ) {

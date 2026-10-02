@@ -1,5 +1,7 @@
 package com.technofuturtic.tournament_api.api.controllers;
 
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.AccessDeniedException;
 import com.technofuturtic.tournament_api.bll.exceptions.TournamentApiException;
 import com.technofuturtic.tournament_api.bll.exceptions.RateLimitException;
 import io.jsonwebtoken.JwtException;
@@ -14,7 +16,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -22,6 +23,16 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestControllerAdvice
 public class ExceptionHandlers {
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<?> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", "Data conflicts with an existing username, email, team name, membership or linked resource"));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<?> handleAccessDenied(AccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "Access denied"));
+    }
 
     @ExceptionHandler(value = RateLimitException.class)
     public ResponseEntity<?> handleRateLimitException(RateLimitException ex) {

@@ -1,5 +1,10 @@
 package com.technofuturtic.tournament_api.dl.entities;
 
+import org.springframework.security.core.userdetails.UserDetails;
+import java.util.Collection;
+import java.util.List;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
@@ -20,7 +25,12 @@ import lombok.Setter;
 @Table(name = "user_")
 @NoArgsConstructor @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false, exclude = {"password"}) @ToString(exclude =  {"password"})
-public class UserEntity extends BaseEntity {
+public class UserEntity extends BaseEntity implements UserDetails {
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role.getName()));
+    }
 
     @Getter
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

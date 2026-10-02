@@ -1,5 +1,6 @@
 package com.technofuturtic.tournament_api.api.filters;
 
+import com.technofuturtic.tournament_api.dal.repositories.UserRepository;
 import com.technofuturtic.tournament_api.api.models.UserContext;
 import com.technofuturtic.tournament_api.api.utils.JwtUtils;
 import jakarta.servlet.FilterChain;
@@ -10,8 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -20,7 +19,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
-    private final UserDetailsService userDetailsService;
+    private final UserRepository userRepository;
     private final JwtUtils jwtUtils;
 
 
@@ -31,8 +30,16 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String token = authorizationHeader.substring(7);
-
-            UserContext user = jwtUtils.getUser(token);
+            if (!jwtUtils.validateToken(token)) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired access token");
+                return;
+            }
+            var entity = userRepository.findWithRoleById(jwtUtils.getId(token)).orElse(null);
+            if (entity == null) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User no longer exists");
+                return;
+            }
+            UserContext user = new UserContext(entity.getId(), entity.getUsername(), entity.getRole().getName());
 
             UsernamePasswordAuthenticationToken upt = new UsernamePasswordAuthenticationToken(
                     user,

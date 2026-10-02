@@ -13,7 +13,7 @@ import java.util.Date;
 @Component
 public class JwtUtils {
 
-    private final JwtBuilder jwtBuilder;
+    private final SecretKey secretKey;
     private final JwtParser jwtParser;
 
     private final long accessTokenValidity; // 15 minutes
@@ -27,15 +27,15 @@ public class JwtUtils {
         this.accessTokenValidity = accessTokenValidity;
         this.refreshTokenValidity = refreshTokenValidity;
 
-        SecretKey secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+        secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes(java.nio.charset.StandardCharsets.UTF_8));
 
-        jwtBuilder = Jwts.builder().signWith(secretKey);
         jwtParser = Jwts.parser().verifyWith(secretKey).build();
     }
 
     public String generateToken(UserEntity user) {
 
-        return jwtBuilder
+        return Jwts.builder().signWith(secretKey)
+                .claim("type", "access")
                 .subject(user.getUsername())
                 .claim("id", user.getId())
                 .claim("role", user.getRole().getName())
@@ -61,23 +61,21 @@ public class JwtUtils {
     }
 
     public UserContext getUser(String token) {
+        Claims claims = parseToken(token);
         return new UserContext(
-                getId(token),
-                getUsername(token),
-                getRole(token)
+                claims.get("id", Integer.class),
+                claims.getSubject(),
+                claims.get("role", String.class)
         );
     }
 
     public boolean validateToken(String token) {
-        Claims claims = parseToken(token);
-
-        Date now = new Date();
-
-        return now.after(claims.getIssuedAt()) && now.before(claims.getExpiration());
+        return validateType(token, "access");
     }
 
     public String generateRefreshToken(UserEntity user) {
-        return jwtBuilder
+        return Jwts.builder().signWith(secretKey)
+                .claim("type", "refresh")
                 .subject(user.getUsername())
                 .claim("id", user.getId())
                 .claim("role", user.getRole().getName())
@@ -87,6 +85,19 @@ public class JwtUtils {
     }
 
     public boolean validateRefreshToken(String token) {
-        return validateToken(token);
+        return validateType(token, "refresh");
+    }
+
+    private boolean validateType(String token, String type) {
+        try {
+            Claims claims = parseToken(token);
+            Date now = new Date();
+            return type.equals(claims.get("type", String.class))
+                    && claims.getIssuedAt() != null && !now.before(claims.getIssuedAt())
+                    && claims.getExpiration() != null && now.before(claims.getExpiration())
+                    && claims.get("id", Integer.class) != null;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
 }
