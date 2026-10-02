@@ -38,12 +38,12 @@ public class MatchEntity {
 
     @Getter @Setter
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "participant1_id", nullable = false)
+    @JoinColumn(name = "participant1_id")
     private ParticipantEntity participant1;
 
     @Getter @Setter
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "participant2_id", nullable = false)
+    @JoinColumn(name = "participant2_id")
     private ParticipantEntity participant2;
 
     @Getter @Setter
@@ -63,6 +63,10 @@ public class MatchEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private MatchStatus status;
+
+    @Getter @Setter
+    @Column(nullable = false)
+    private Integer orderIndex;
 
     @Getter @Setter
     private LocalDate scheduledDate;

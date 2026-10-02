@@ -71,10 +71,9 @@ public class MatchGenerator {
         for (int i = 0; i < slots.size(); i+=2) {
             ParticipantEntity participant1 = slots.get(i);
             ParticipantEntity participant2 = slots.get(i + 1);
-
-            if (participant1 != null && participant2 != null) {
-                matches.add(newMatch(round, participant1, participant2));
-            }
+            MatchEntity match = newMatch(round, participant1, participant2);
+            match.setOrderIndex((i / 2) + 1);
+            matches.add(match);
         }
 
         return matches;
@@ -87,7 +86,13 @@ public class MatchGenerator {
         match.setParticipant2(participant2);
         match.setScore1(0);
         match.setScore2(0);
-        match.setStatus(MatchStatus.PENDING);
+        if (participant1 == null || participant2 == null) {
+            match.setWinner(participant1 != null ? participant1 : participant2);
+            match.setStatus(MatchStatus.BYE);
+        } else {
+            match.setStatus(MatchStatus.PENDING);
+        }
+
         return match;
     }
 }

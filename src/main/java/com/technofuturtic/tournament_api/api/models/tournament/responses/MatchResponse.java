@@ -13,6 +13,7 @@ public record MatchResponse(
         Integer score2,
         ParticipantResponse winner,
         MatchStatus status,
+        Integer orderIndex,
         LocalDate scheduledDate
 ) {
 
@@ -27,6 +28,7 @@ public record MatchResponse(
                         ? ParticipantResponse.fromEntity(match.getWinner())
                         : null,
                 match.getStatus(),
+                match.getOrderIndex(),
                 match.getScheduledDate()
         );
     }
