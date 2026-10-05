@@ -1,7 +1,7 @@
 package com.technofuturtic.tournament_api.bll.services.impls;
 
 import com.technofuturtic.tournament_api.api.models.tournament.requests.TournamentRequest;
-import com.technofuturtic.tournament_api.api.models.tournament.responses.TournamentReponse;
+import com.technofuturtic.tournament_api.api.models.tournament.responses.TournamentResponse;
 import com.technofuturtic.tournament_api.bll.exceptions.tournament.TournamentNotFoundException;
 import com.technofuturtic.tournament_api.bll.exceptions.user.UserNotFoundException;
 import com.technofuturtic.tournament_api.bll.services.TournamentService;
@@ -10,9 +10,9 @@ import com.technofuturtic.tournament_api.dal.repositories.UserRepository;
 import com.technofuturtic.tournament_api.dl.entities.TournamentEntity;
 import com.technofuturtic.tournament_api.dl.entities.UserEntity;
 import com.technofuturtic.tournament_api.dl.enums.TournamentStatus;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ public class TournamentServiceImpl implements TournamentService {
     //Création d'un tournament
     @Override
     @Transactional
-    public TournamentReponse create(TournamentRequest request){
+    public TournamentResponse create(TournamentRequest request){
         validateDates(request);
 
         UserEntity organizer = userRepository.findById(request.organizerId())
@@ -46,12 +46,11 @@ public class TournamentServiceImpl implements TournamentService {
         tournament.setOrganizer(organizer);
         tournament.setStatus(TournamentStatus.UPCOMING);
 
-        return TournamentReponse.fromEntity(tournamentRepository.save(tournament));
+        return TournamentResponse.fromEntity(tournamentRepository.save(tournament));
     }
 
     //Vérification des dates
-    @Override
-    public void validateDates(TournamentRequest request) {
+    private void validateDates(TournamentRequest request) {
         if (request.endDate().isBefore(request.startDate())) {
             throw new IllegalArgumentException("La date de fin doit être après la date de début");
         }
@@ -66,27 +65,30 @@ public class TournamentServiceImpl implements TournamentService {
 
     //Récupération d'un tournament avec l'ID
     @Override
-    public TournamentReponse getById(Integer id) {
+    @Transactional(readOnly = true)
+    public TournamentResponse getById(Integer id) {
         return tournamentRepository.findById(id)
-                .map(TournamentReponse::fromEntity)
+                .map(TournamentResponse::fromEntity)
                 .orElseThrow(() -> new TournamentNotFoundException("Tournament non trouvé, Id : " + id));
     }
 
     //Récupération d'une liste avec tous les tournament
     @Override
-    public List<TournamentReponse> getAll(TournamentStatus status) {
+    @Transactional(readOnly = true)
+    public List<TournamentResponse> getAll(TournamentStatus status) {
         List<TournamentEntity> tournaments = (status == null)
                 ? tournamentRepository.findAll()
                 : tournamentRepository.findByStatus(status);
 
         return tournaments.stream()
-                .map(TournamentReponse::fromEntity)
+                .map(TournamentResponse::fromEntity)
                 .toList();
     }
 
     //Mise à jour d'un tournament
     @Override
-    public TournamentReponse update(Integer id, TournamentRequest request) {
+    @Transactional
+    public TournamentResponse update(Integer id, TournamentRequest request) {
         TournamentEntity tournament = tournamentRepository.findById(id)
                 .orElseThrow(() -> new TournamentNotFoundException("Tournament non trouvé, Id : " + id));
 
@@ -109,12 +111,13 @@ public class TournamentServiceImpl implements TournamentService {
         tournament.setRegistrationStartDate(request.registrationStartDate());
         tournament.setRegistrationEndDate(request.registrationEndDate());
 
-        return TournamentReponse.fromEntity(tournamentRepository.save(tournament));
+        return TournamentResponse.fromEntity(tournamentRepository.save(tournament));
     }
 
     //Mettre un tournament en statut CANCELED
     @Override
-    public TournamentReponse cancel(Integer id) {
+    @Transactional
+    public TournamentResponse cancel(Integer id) {
         TournamentEntity tournament = tournamentRepository.findById(id)
                 .orElseThrow(() -> new TournamentNotFoundException("Tournament non trouvé, Id : " + id));
 
@@ -128,8 +131,23 @@ public class TournamentServiceImpl implements TournamentService {
         }
 
         tournament.setStatus(TournamentStatus.CANCELED);
-        return TournamentReponse.fromEntity(tournamentRepository.save(tournament));
+        return TournamentResponse.fromEntity(tournamentRepository.save(tournament));
     }
 
+    //Changer le statut d'un tournament en respectant les transitions autorisées
+    @Override
+    @Transactional
+    public TournamentResponse changeStatus(Integer id, TournamentStatus newStatus) {
+        TournamentEntity tournament = tournamentRepository.findById(id)
+                .orElseThrow(() -> new TournamentNotFoundException("Tournament non trouvé, Id : " + id));
+
+        if (!tournament.getStatus().canTransitionTo(newStatus)) {
+            throw new IllegalStateException("Passage de " + tournament.getStatus()
+                    + " à " + newStatus + " impossible.");
+        }
+
+        tournament.setStatus(newStatus);
+        return TournamentResponse.fromEntity(tournamentRepository.save(tournament));
+    }
 
 }

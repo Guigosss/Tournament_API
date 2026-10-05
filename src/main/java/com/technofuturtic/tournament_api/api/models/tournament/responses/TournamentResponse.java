@@ -7,7 +7,7 @@ import com.technofuturtic.tournament_api.dl.enums.TournamentStatus;
 
 import java.time.LocalDate;
 
-public record TournamentReponse(
+public record TournamentResponse(
         Integer id,
         String name,
         String description,
@@ -22,8 +22,8 @@ public record TournamentReponse(
         Integer organizerId,
         String organizerUsername
 ) {
-    public static  TournamentReponse fromEntity(TournamentEntity t){
-        return new TournamentReponse(
+    public static TournamentResponse fromEntity(TournamentEntity t){
+        return new TournamentResponse(
                 t.getId(), t.getName(), t.getDescription(), t.getMaxParticipants(),
                 t.getFormat(), t.getStatus(), t.getParticipantType(),
                 t.getStartDate(), t.getEndDate(),
