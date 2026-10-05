@@ -1,5 +1,10 @@
 package com.technofuturtic.tournament_api.dl.entities;
 
+import org.springframework.security.core.userdetails.UserDetails;
+import java.util.Collection;
+import java.util.List;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
@@ -20,18 +25,23 @@ import lombok.Setter;
 @Table(name = "user_")
 @NoArgsConstructor @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false, exclude = {"password"}) @ToString(exclude =  {"password"})
-public class UserEntity extends BaseEntity {
+public class UserEntity extends BaseEntity implements UserDetails {
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role.getName()));
+    }
 
     @Getter
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Getter @Setter
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String username;
 
     @Getter @Setter
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String email;
 
     @Getter @Setter
@@ -45,4 +55,20 @@ public class UserEntity extends BaseEntity {
     )
     private RoleEntity role;
 
+    public UserEntity(String username) {
+        this();
+        this.username = username;
+    }
+
+    public UserEntity(String username, String email, String password) {
+        this();
+        this.username = username;
+        this.email = email;
+        this.password = password;
+    }
+
+    public UserEntity(String username,String email, String password, RoleEntity role) {
+        this(username,email, password);
+        this.role = role;
+    }
 }

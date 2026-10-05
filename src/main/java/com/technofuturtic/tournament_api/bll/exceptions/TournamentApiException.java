@@ -6,7 +6,7 @@ import lombok.ToString;
 import org.springframework.http.HttpStatus;
 
 @EqualsAndHashCode(callSuper = false) @ToString
-public class TournamentApiException extends RuntimeException {
+public abstract class TournamentApiException extends RuntimeException {
 
     @Getter
     private String section;
