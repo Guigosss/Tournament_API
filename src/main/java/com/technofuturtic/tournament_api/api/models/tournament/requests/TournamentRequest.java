@@ -17,7 +17,6 @@ public record TournamentRequest(
         @NotNull LocalDate startDate,
         @NotNull LocalDate endDate,
         @NotNull LocalDate registrationStartDate,
-        @NotNull LocalDate registrationEndDate,
-        @NotNull Integer organizerId
+        @NotNull LocalDate registrationEndDate
 ) {
 }

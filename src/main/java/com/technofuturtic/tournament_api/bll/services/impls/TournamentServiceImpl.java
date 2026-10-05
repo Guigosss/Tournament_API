@@ -1,5 +1,6 @@
 package com.technofuturtic.tournament_api.bll.services.impls;
 
+import com.technofuturtic.tournament_api.api.models.UserContext;
 import com.technofuturtic.tournament_api.api.models.tournament.requests.TournamentRequest;
 import com.technofuturtic.tournament_api.api.models.tournament.responses.TournamentResponse;
 import com.technofuturtic.tournament_api.bll.exceptions.tournament.TournamentNotFoundException;
@@ -11,6 +12,8 @@ import com.technofuturtic.tournament_api.dl.entities.TournamentEntity;
 import com.technofuturtic.tournament_api.dl.entities.UserEntity;
 import com.technofuturtic.tournament_api.dl.enums.TournamentStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,11 +30,21 @@ public class TournamentServiceImpl implements TournamentService {
     //Création d'un tournament
     @Override
     @Transactional
-    public TournamentResponse create(TournamentRequest request){
+    public TournamentResponse create(TournamentRequest request) {
         validateDates(request);
 
-        UserEntity organizer = userRepository.findById(request.organizerId())
-                .orElseThrow(() -> new UserNotFoundException("Organisateur non trouvé, Id : " + request.organizerId()));
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        UserContext userContext = (UserContext) authentication.getPrincipal();
+
+        UserEntity organizer = userRepository.findById(userContext.id())
+                .orElseThrow(() ->
+                        new UserNotFoundException(
+                                "Utilisateur connecté non trouvé : " + userContext.id()
+                        )
+                );
+
 
         TournamentEntity tournament = new TournamentEntity();
         tournament.setName(request.name());
@@ -46,7 +59,9 @@ public class TournamentServiceImpl implements TournamentService {
         tournament.setOrganizer(organizer);
         tournament.setStatus(TournamentStatus.UPCOMING);
 
-        return TournamentResponse.fromEntity(tournamentRepository.save(tournament));
+        return TournamentResponse.fromEntity(
+                tournamentRepository.save(tournament)
+        );
     }
 
     //Vérification des dates
