@@ -35,10 +35,10 @@ public class TeamEntity extends BaseEntity {
     @Getter @Setter
     @Column(nullable = false, unique = true, length = 50)
     private String name;
-
+//TODO revoir la taille des equipes
     @Getter @Setter
     @Column(nullable = false)
-    private Integer teamSize;
+    private Integer teamSize = 5;
 
     @Getter @Setter
     @Column(nullable = false)
