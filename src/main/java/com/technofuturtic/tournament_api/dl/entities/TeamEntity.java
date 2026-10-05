@@ -10,6 +10,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.JoinTable;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -32,22 +33,29 @@ public class TeamEntity extends BaseEntity {
     private Integer id;
 
     @Getter @Setter
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true, length = 50)
     private String name;
 
     @Getter @Setter
-    private Integer numberOfWins;
+    @Column(nullable = false)
+    private Integer numberOfWins = 0;
 
     @Getter @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "captain_id", nullable = false)
     private UserEntity captain;
 
+    @Getter
     @ManyToMany
     @JoinTable(
             name = "team_member",
             joinColumns = @JoinColumn(name = "team_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
+            inverseJoinColumns = @JoinColumn(name = "user_id", nullable = false),
+            uniqueConstraints = @UniqueConstraint(name = "uk_team_member_pair", columnNames = {"team_id", "user_id"})
     )
     private Set<UserEntity> members = new HashSet<>();
+
+    public void addMember(UserEntity user) {
+        members.add(java.util.Objects.requireNonNull(user));
+    }
 }
