@@ -55,6 +55,7 @@ public class TournamentEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private TournamentStatus status;
 
+    @Getter @Setter
     @Enumerated(EnumType.STRING)
     private ParticipantType participantType;
 
