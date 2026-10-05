@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.UniqueConstraint;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -16,7 +17,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "participant")
+@Table(name = "participant", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"tournament_id", "user_id"}),
+        @UniqueConstraint(columnNames = {"tournament_id", "team_id"})
+    })
 @NoArgsConstructor @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false) @ToString
 public class ParticipantEntity {

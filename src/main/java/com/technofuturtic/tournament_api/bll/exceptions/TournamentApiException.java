@@ -17,6 +17,12 @@ public abstract class TournamentApiException extends RuntimeException {
     @Getter
     private final Object body;
 
+    /**
+     * Constructeur parent.
+     * @param status code HTTP de réponse
+     * @param body contenu du body pour le client
+     * @param section section métier concernée (user, game, etc.)
+     */
     public TournamentApiException(HttpStatus status, Object body, String section) {
         super();
         this.status = status;

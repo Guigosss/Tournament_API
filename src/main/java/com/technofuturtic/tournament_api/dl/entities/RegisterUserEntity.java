@@ -1,14 +1,7 @@
 package com.technofuturtic.tournament_api.dl.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Column;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
+import com.technofuturtic.tournament_api.dl.enums.RegistrationStatus;
+import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,7 +10,8 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "register_user")
+@Table(name = "register_user",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "tournament_id"}))
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 public class RegisterUserEntity {
@@ -39,5 +33,6 @@ public class RegisterUserEntity {
 
     @Getter @Setter
     @Column(nullable = false)
-    private String status; //- Enum
+    @Enumerated(EnumType.STRING)
+    private RegistrationStatus status;
 }

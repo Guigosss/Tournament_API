@@ -38,6 +38,10 @@ public class TeamEntity extends BaseEntity {
 
     @Getter @Setter
     @Column(nullable = false)
+    private Integer teamSize;
+
+    @Getter @Setter
+    @Column(nullable = false)
     private Integer numberOfWins = 0;
 
     @Getter @Setter

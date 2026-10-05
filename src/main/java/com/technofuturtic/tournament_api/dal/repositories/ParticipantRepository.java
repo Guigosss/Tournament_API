@@ -4,10 +4,14 @@ import com.technofuturtic.tournament_api.dl.entities.ParticipantEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.List;
 
 @Repository
 public interface ParticipantRepository extends JpaRepository<ParticipantEntity, Integer> {
 
     List<ParticipantEntity> findByTournamentId(Integer tournamentId);
+    Optional<ParticipantEntity> findByUserIdAndTournamentId(Integer userId, Integer tournamentId);
+    Optional<ParticipantEntity> findByTeamIdAndTournamentId(Integer teamId, Integer tournamentId);
+
 }

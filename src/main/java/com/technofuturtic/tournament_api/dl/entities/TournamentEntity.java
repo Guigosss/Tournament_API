@@ -13,6 +13,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.FetchType;
+import com.technofuturtic.tournament_api.dl.enums.ParticipantType;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -50,13 +51,20 @@ public class TournamentEntity extends BaseEntity {
     private TournamentFormat format;
 
     @Getter @Setter
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private TournamentStatus status;
+
+    @Enumerated(EnumType.STRING)
+    private ParticipantType participantType;
 
     @Getter @Setter
     @Column(nullable = false)
     private LocalDate startDate;
+
+    @Getter @Setter
+    @Column(nullable = false)
+    private LocalDate endDate;
 
     @Getter @Setter
     @Column(nullable = false)
