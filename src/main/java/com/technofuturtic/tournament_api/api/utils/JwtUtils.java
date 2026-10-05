@@ -2,7 +2,10 @@ package com.technofuturtic.tournament_api.api.utils;
 
 import com.technofuturtic.tournament_api.api.models.UserContext;
 import com.technofuturtic.tournament_api.dl.entities.UserEntity;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
