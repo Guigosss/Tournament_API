@@ -45,9 +45,13 @@ public class TournamentGenerator {
             rounds.addAll(roundGenerator.generate(phase, participants.size()));
         }
 
-        //- Generate Matches ONLY for first round
-        if (!rounds.isEmpty()) {
-            matchGenerator.generate(rounds.get(0), participants);
+        //- Generate All Matches
+        for (RoundEntity round : rounds) {
+            if (round.getOrderIndex() == 1) {
+                matchGenerator.generateFirstRounds(round, participants);
+            } else {
+                matchGenerator.generateEmpty(round);
+            }
         }
 
         tournament.setStatus(TournamentStatus.IN_PROGRESS);

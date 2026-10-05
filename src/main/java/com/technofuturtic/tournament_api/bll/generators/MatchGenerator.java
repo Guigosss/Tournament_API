@@ -22,11 +22,21 @@ public class MatchGenerator {
 
     private final Random random = new Random();
 
-    public void generate(RoundEntity round, List<ParticipantEntity> participants) {
+    public void generateFirstRounds(RoundEntity round, List<ParticipantEntity> participants) {
         int bracketSize = round.getType().getBracketSize();
         int byeCount = calculateByeCount(bracketSize, participants.size());
-        List<ParticipantEntity> slots = createSlots(participants, byeCount, bracketSize);
-        matchRepository.saveAll(createMatchesFromSlots(round, slots));
+        List<ParticipantEntity> slots = createFirstRoundSlots(participants, byeCount, bracketSize);
+        saveMatches(round, slots);
+    }
+
+    public void generateEmpty(RoundEntity round) {
+        int bracketSize = round.getType().getBracketSize();
+        List<ParticipantEntity> slots = createEmptySlots(bracketSize);
+        saveMatches(round, slots);
+    }
+
+    private void saveMatches(RoundEntity round, List<ParticipantEntity> slots) {
+        matchRepository.saveAll(createMatches(round, slots));
     }
 
     private int calculateByeCount(int bracketSize, int participantCount) {
@@ -43,7 +53,7 @@ public class MatchGenerator {
         return shuffled;
     }
 
-    private List<ParticipantEntity> createSlots(List<ParticipantEntity> participants, int byeCount, int bracketSize) {
+    private List<ParticipantEntity> createFirstRoundSlots(List<ParticipantEntity> participants, int byeCount, int bracketSize) {
         List<ParticipantEntity> shuffled = shuffleParticipants(participants);
         int matchCount = bracketSize / 2;
 
@@ -66,12 +76,16 @@ public class MatchGenerator {
         return slots;
     }
 
-    private List<MatchEntity> createMatchesFromSlots(RoundEntity round, List<ParticipantEntity> slots) {
+    private List<ParticipantEntity> createEmptySlots(int bracketSize) {
+        return new ArrayList<>(Collections.nCopies(bracketSize, null));
+    }
+
+    private List<MatchEntity> createMatches(RoundEntity round, List<ParticipantEntity> slots) {
         List<MatchEntity> matches = new ArrayList<>();
         for (int i = 0; i < slots.size(); i+=2) {
             ParticipantEntity participant1 = slots.get(i);
             ParticipantEntity participant2 = slots.get(i + 1);
-            MatchEntity match = newMatch(round, participant1, participant2);
+            MatchEntity match = createMatch(round, participant1, participant2);
             match.setOrderIndex((i / 2) + 1);
             matches.add(match);
         }
@@ -79,14 +93,16 @@ public class MatchGenerator {
         return matches;
     }
 
-    private MatchEntity newMatch(RoundEntity round, ParticipantEntity participant1, ParticipantEntity participant2) {
+    private MatchEntity createMatch(RoundEntity round, ParticipantEntity participant1, ParticipantEntity participant2) {
         MatchEntity match = new MatchEntity();
         match.setRound(round);
         match.setParticipant1(participant1);
         match.setParticipant2(participant2);
         match.setScore1(0);
         match.setScore2(0);
-        if (participant1 == null || participant2 == null) {
+        if (participant1 == null && participant2 == null){
+            match.setStatus(MatchStatus.WAITING);
+        } else if (participant1 == null || participant2 == null) {
             match.setWinner(participant1 != null ? participant1 : participant2);
             match.setStatus(MatchStatus.BYE);
         } else {
