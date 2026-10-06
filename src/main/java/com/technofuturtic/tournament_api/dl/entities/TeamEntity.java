@@ -12,6 +12,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.JoinTable;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -58,6 +60,9 @@ public class TeamEntity extends BaseEntity {
             uniqueConstraints = @UniqueConstraint(name = "uk_team_member_pair", columnNames = {"team_id", "user_id"})
     )
     private Set<UserEntity> members = new HashSet<>();
+
+    public TeamEntity(@NotBlank(message = "Team name is required") @Size(max = 50, message = "Team name max 50 chars") String name) {
+    }
 
     public void addMember(UserEntity user) {
         members.add(java.util.Objects.requireNonNull(user));

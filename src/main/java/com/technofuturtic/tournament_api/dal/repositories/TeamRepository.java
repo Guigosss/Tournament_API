@@ -12,4 +12,6 @@ public interface TeamRepository extends JpaRepository<TeamEntity, Integer> {
     @Query("select count(t) > 0 from TeamEntity t left join t.members m "
             + "where t.captain.id = :userId or m.id = :userId")
     boolean existsByPlayerId(Integer userId);
+    boolean existsByIdAndCaptainId(Integer teamId, Integer captainId);
+
 }

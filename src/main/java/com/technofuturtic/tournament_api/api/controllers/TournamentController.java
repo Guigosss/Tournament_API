@@ -11,6 +11,7 @@ import com.technofuturtic.tournament_api.dl.enums.TournamentStatus;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -60,38 +61,40 @@ public class TournamentController {
     }
 
     //Mise à jour d'un tournament par Id
-    @PutMapping({"/{id}"})
+    @PreAuthorize("hasAuthority('admin') or @securityService.isTournamentOrganizer(#tournamentId)")
+    @PutMapping({"/{tournamentId}"})
     public ResponseEntity<TournamentResponse> update(
-            @PathVariable Integer id,
+            @PathVariable Integer tournamentId,
             @Valid
             @RequestBody TournamentRequest request
     ) {
-        return ResponseEntity.ok(tournamentService.update(id, request));
+        return ResponseEntity.ok(tournamentService.update(tournamentId, request));
     }
 
-    //TODO Vérifier que c'est bien l'organisateur qui CANCELED
     //Met un tournament en statut CANCELED
-    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('admin') or @securityService.isTournamentOrganizer(#tournamentId)")
+    @DeleteMapping("/{tournamentId}")
     public ResponseEntity<TournamentResponse> cancel(
-            @PathVariable Integer id
+            @PathVariable Integer tournamentId
     ) {
-        return ResponseEntity.ok(tournamentService.cancel(id));
+        return ResponseEntity.ok(tournamentService.cancel(tournamentId));
     }
 
-    //TODO Vérifier que c'est bien l'organisateur
     //Ouvrir les inscriptions d'un tournament
-    @PatchMapping("/{id}/open-registrations")
-    public ResponseEntity<TournamentResponse> openRegistrations(@PathVariable Integer id) {
-        return ResponseEntity.ok(tournamentService.changeStatus(id, TournamentStatus.REGISTRATION_OPEN));
+    @PreAuthorize("hasAuthority('admin') or @securityService.isTournamentOrganizer(#tournamentId)")
+    @PatchMapping("/{tournamentId}/open-registrations")
+    public ResponseEntity<TournamentResponse> openRegistrations(@PathVariable Integer tournamentId) {
+        return ResponseEntity.ok(tournamentService.changeStatus(tournamentId, TournamentStatus.REGISTRATION_OPEN));
     }
 
-    //TODO Vérifier que c'est bien l'organisateur
     //Fermer les inscriptions d'un tournament
-    @PatchMapping("/{id}/close-registrations")
-    public ResponseEntity<TournamentResponse> closeRegistrations(@PathVariable Integer id) {
-        return ResponseEntity.ok(tournamentService.changeStatus(id, TournamentStatus.REGISTRATION_CLOSED));
+    @PreAuthorize("hasAuthority('admin') or @securityService.isTournamentOrganizer(#tournamentId)")
+    @PatchMapping("/{tournamentId}/close-registrations")
+    public ResponseEntity<TournamentResponse> closeRegistrations(@PathVariable Integer tournamentId) {
+        return ResponseEntity.ok(tournamentService.changeStatus(tournamentId, TournamentStatus.REGISTRATION_CLOSED));
     }
 
+    @PreAuthorize("hasAuthority('admin') or @securityService.isTournamentOrganizer(#tournamentId)")
     @PostMapping("/{tournamentId}/generate")
     public ResponseEntity<Void> generateTournament(@PathVariable Integer tournamentId) {
         tournamentEngineService.generateTournament(tournamentId);
