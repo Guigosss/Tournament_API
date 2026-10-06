@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RoundRepository extends JpaRepository<RoundEntity, Integer> {
@@ -21,4 +22,6 @@ public interface RoundRepository extends JpaRepository<RoundEntity, Integer> {
         ORDER BY r.orderIndex
         """)
     List<RoundEntity> findByTournamentAndPhase(@Param("tournamentId") Integer tournamentId, @Param("phaseId") Integer phaseId);
+
+    Optional<RoundEntity> findByPhaseIdAndOrderIndex(Integer phaseId, Integer orderIndex);
 }

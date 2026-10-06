@@ -4,12 +4,16 @@ import com.technofuturtic.tournament_api.bll.exceptions.engine.tournament.Tourna
 import com.technofuturtic.tournament_api.bll.exceptions.engine.tournament.TournamentNotFoundException;
 import com.technofuturtic.tournament_api.bll.exceptions.engine.tournament.TournamentNotReadyToStartException;
 import com.technofuturtic.tournament_api.bll.exceptions.engine.tournament.TournamentParticipantLimitExceededException;
+import com.technofuturtic.tournament_api.bll.services.TournamentProgressionService;
+import com.technofuturtic.tournament_api.dal.repositories.MatchRepository;
 import com.technofuturtic.tournament_api.dal.repositories.ParticipantRepository;
 import com.technofuturtic.tournament_api.dal.repositories.TournamentRepository;
+import com.technofuturtic.tournament_api.dl.entities.TournamentEntity;
 import com.technofuturtic.tournament_api.dl.entities.ParticipantEntity;
 import com.technofuturtic.tournament_api.dl.entities.PhaseEntity;
 import com.technofuturtic.tournament_api.dl.entities.RoundEntity;
-import com.technofuturtic.tournament_api.dl.entities.TournamentEntity;
+import com.technofuturtic.tournament_api.dl.entities.MatchEntity;
+import com.technofuturtic.tournament_api.dl.enums.MatchStatus;
 import com.technofuturtic.tournament_api.dl.enums.TournamentStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -28,6 +32,9 @@ public class TournamentGenerator {
     private final PhaseGenerator phaseGenerator;
     private final RoundGenerator roundGenerator;
     private final MatchGenerator matchGenerator;
+
+    private final MatchRepository matchRepository;
+    private final TournamentProgressionService tournamentProgressionService;
 
     @Transactional
     public void generate(Integer tournamentId)  {
@@ -52,6 +59,13 @@ public class TournamentGenerator {
             } else {
                 matchGenerator.generateEmpty(round);
             }
+        }
+
+        //- Progress first round byes
+        RoundEntity firstRound = rounds.stream().filter(round -> round.getOrderIndex() == 1).findFirst().orElseThrow();
+        List<MatchEntity> byeMatches = matchRepository.findByRoundIdAndStatus(firstRound.getId(), MatchStatus.BYE);
+        for (MatchEntity match : byeMatches) {
+            tournamentProgressionService.progress(match);
         }
 
         tournament.setStatus(TournamentStatus.IN_PROGRESS);
