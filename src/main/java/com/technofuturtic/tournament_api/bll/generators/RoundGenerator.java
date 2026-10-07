@@ -1,6 +1,7 @@
 package com.technofuturtic.tournament_api.bll.generators;
 
 import com.technofuturtic.tournament_api.bll.exceptions.engine.round.EliminationParticipantCountOutOfRangeException;
+import com.technofuturtic.tournament_api.bll.generators.rules.EliminationRules;
 import com.technofuturtic.tournament_api.dal.repositories.RoundRepository;
 import com.technofuturtic.tournament_api.dl.entities.PhaseEntity;
 import com.technofuturtic.tournament_api.dl.entities.RoundEntity;
@@ -15,14 +16,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RoundGenerator {
 
-    private static final int MIN_PARTICIPANTS = 2;
-    private static final int MAX_PARTICIPANTS = 128;
-
     private final RoundRepository roundRepository;
 
     public List<RoundEntity> generate(PhaseEntity phase, int participantCount) {
+        validateParticipantCount(participantCount);
+
         List<RoundEntity> rounds = switch (phase.getType()) {
+
             case ELIMINATION -> generateElimination(phase, participantCount);
+
             case GROUP_STAGE, LOSERS_BRACKET -> List.of(); // TODO
         };
 
@@ -30,12 +32,8 @@ public class RoundGenerator {
     }
 
     private List<RoundEntity> generateElimination(PhaseEntity phase, int participantCount) {
-        if (participantCount < MIN_PARTICIPANTS || participantCount > MAX_PARTICIPANTS) {
-            throw new EliminationParticipantCountOutOfRangeException(MIN_PARTICIPANTS, MAX_PARTICIPANTS);
-        }
-
         //- Next exponent 2
-        int bracketSize = (int) Math.pow(2, Math.ceil(Math.log(participantCount) / Math.log(2)));
+        int bracketSize = EliminationRules.bracketSize(participantCount);
 
         List<RoundType> types = new ArrayList<>();
         List<RoundEntity> rounds = new ArrayList<>();
@@ -51,6 +49,12 @@ public class RoundGenerator {
         }
 
         return rounds;
+    }
+
+    private void validateParticipantCount(int participantCount) {
+        if (participantCount < EliminationRules.MIN_PARTICIPANTS || participantCount > EliminationRules.MAX_PARTICIPANTS) {
+            throw new EliminationParticipantCountOutOfRangeException(EliminationRules.MIN_PARTICIPANTS, EliminationRules.MAX_PARTICIPANTS);
+        }
     }
 
     private RoundEntity newRound(PhaseEntity phase, RoundType type, int orderIndex) {
