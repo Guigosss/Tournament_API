@@ -29,6 +29,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception{
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(e -> e
@@ -37,10 +38,12 @@ public class SecurityConfig {
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(r ->
                         r.requestMatchers("/register", "/login", "/refresh", "/error", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/{id}").permitAll()
+                                .requestMatchers("/invitations", "/invitations/**", "/notifications", "/notifications/**").authenticated()
+                                .requestMatchers("/join-requests", "/join-requests/**", "/teams/*/join-requests").authenticated()
+                                .requestMatchers(HttpMethod.GET, "/players/search", "/teams/search").authenticated()
+                                .requestMatchers(HttpMethod.GET, "/{id}", "/teams/{teamId}").permitAll()
                                 .anyRequest().authenticated()
                 );
-
         return http.build();
     }
 

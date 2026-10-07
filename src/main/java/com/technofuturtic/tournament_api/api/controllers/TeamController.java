@@ -4,6 +4,9 @@ import com.technofuturtic.tournament_api.api.models.UserContext;
 import com.technofuturtic.tournament_api.api.models.team.requests.TeamCreateRequest;
 import com.technofuturtic.tournament_api.api.models.team.requests.TeamUpdateRequest;
 import com.technofuturtic.tournament_api.api.models.team.responses.TeamResponse;
+import com.technofuturtic.tournament_api.api.models.team.responses.TeamSearchResponse;
+import java.util.List;
+import java.util.ArrayList;
 import com.technofuturtic.tournament_api.bll.services.TeamService;
 import com.technofuturtic.tournament_api.dl.entities.TeamEntity;
 import jakarta.validation.Valid;
@@ -20,6 +23,23 @@ import org.springframework.web.bind.annotation.*;
 public class TeamController {
 
     private final TeamService teamService;
+
+    @GetMapping("/search")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<TeamSearchResponse>> search(
+            @RequestParam String name) {
+        List<TeamSearchResponse> results = new ArrayList<>();
+        for (TeamEntity team : teamService.search(name)) {
+            results.add(new TeamSearchResponse(team.getId(), team.getName(), team.isArchived()));
+        }
+        return ResponseEntity.ok(results);
+    }
+
+    @GetMapping("/{teamId}")
+    public ResponseEntity<TeamResponse> findById(@PathVariable Integer teamId) {
+        TeamEntity team = teamService.findById(teamId);
+        return ResponseEntity.ok(TeamResponse.fromTeam(team));
+    }
 
     @PostMapping
     @PreAuthorize("isAuthenticated()")

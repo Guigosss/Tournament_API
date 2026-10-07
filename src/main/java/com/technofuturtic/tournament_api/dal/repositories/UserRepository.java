@@ -9,6 +9,10 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Integer> {
+    java.util.List<UserEntity> findTop20ByDeletedFalseAndUsernameContainingIgnoreCaseOrderByUsernameAsc(String username);
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @Query("select u from UserEntity u where u.id = :id")
+    Optional<UserEntity> findByIdForUpdate(Integer id);
 
     boolean existsByUsername(String username);
 

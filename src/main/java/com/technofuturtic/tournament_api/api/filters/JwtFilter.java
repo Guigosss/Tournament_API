@@ -35,7 +35,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 return;
             }
             var entity = userRepository.findWithRoleById(jwtUtils.getId(token)).orElse(null);
-            if (entity == null) {
+            if (entity == null || entity.isDeleted() || !jwtUtils.matchesTokenVersion(token, entity)) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User no longer exists");
                 return;
             }

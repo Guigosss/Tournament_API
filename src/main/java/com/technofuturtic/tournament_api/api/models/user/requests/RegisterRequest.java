@@ -20,7 +20,11 @@ public record RegisterRequest(
 
         @NotBlank(message = "Password is required")
         @Size(min = 8, max = 72, message = "Password must contain between 8 and 72 characters")
-        String password
+        String password,
+
+        @NotBlank(message = "Password confirmation is required")
+        @Size(max = 72, message = "Password confirmation max 72 chars")
+        String confirmPassword
 ) {
 
     public UserEntity toUser() {
@@ -29,6 +33,11 @@ public record RegisterRequest(
                 email,
                 password
         );
+    }
+
+    @AssertTrue(message = "Password confirmation must match password")
+    public boolean isPasswordConfirmationMatching() {
+        return password != null && password.equals(confirmPassword);
     }
 
     @AssertTrue(message = "Password must not exceed 72 UTF-8 bytes")

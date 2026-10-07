@@ -82,8 +82,12 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         checkRegistrationType(tournament, ParticipantType.TEAM);
 
-        TeamEntity team = teamRepository.findById(teamId)
+        TeamEntity team = teamRepository.findByIdForUpdate(teamId)
                 .orElseThrow(() -> new TeamNotFoundException("Team non trouvé, Id : " + teamId));
+
+        if (team.isArchived()) {
+            throw new com.technofuturtic.tournament_api.bll.exceptions.team.TeamConflictException("team", "Une équipe archivée ne peut pas s'inscrire à un tournoi.");
+        }
 
         checkRegistrationOpen(tournament);
 
@@ -230,6 +234,11 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     @Transactional
     public RegistrationResponse validateTeam(Integer tournamentId, Integer teamId) {
+        TeamEntity team = teamRepository.findByIdForUpdate(teamId)
+                .orElseThrow(() -> new TeamNotFoundException("Team non trouvé, Id : " + teamId));
+        if (team.isArchived()) {
+            throw new com.technofuturtic.tournament_api.bll.exceptions.team.TeamConflictException("team", "Une équipe archivée ne peut plus être validée pour un tournoi.");
+        }
         TournamentEntity tournament = tournamentRepository.findById(tournamentId)
                 .orElseThrow(() -> new TournamentNotFoundException("Tournament non trouvé, Id : " + tournamentId));
 

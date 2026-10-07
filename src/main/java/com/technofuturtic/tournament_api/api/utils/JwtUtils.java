@@ -39,6 +39,8 @@ public class JwtUtils {
 
         return Jwts.builder().signWith(secretKey)
                 .claim("type", "access")
+                .claim("version", user.getTokenVersion())
+                .id(java.util.UUID.randomUUID().toString())
                 .subject(user.getUsername())
                 .claim("id", user.getId())
                 .claim("role", user.getRole().getName())
@@ -79,6 +81,8 @@ public class JwtUtils {
     public String generateRefreshToken(UserEntity user) {
         return Jwts.builder().signWith(secretKey)
                 .claim("type", "refresh")
+                .claim("version", user.getTokenVersion())
+                .id(java.util.UUID.randomUUID().toString())
                 .subject(user.getUsername())
                 .claim("id", user.getId())
                 .claim("role", user.getRole().getName())
@@ -89,6 +93,12 @@ public class JwtUtils {
 
     public boolean validateRefreshToken(String token) {
         return validateType(token, "refresh");
+    }
+
+    public boolean matchesTokenVersion(String token, UserEntity user) {
+        Number version = parseToken(token).get("version", Number.class);
+        // Les anciens tokens sans version correspondent à la version initiale.
+        return (version == null ? 0L : version.longValue()) == user.getTokenVersion();
     }
 
     private boolean validateType(String token, String type) {

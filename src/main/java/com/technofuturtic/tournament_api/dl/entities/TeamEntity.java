@@ -30,6 +30,10 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = false) @ToString
 public class TeamEntity extends BaseEntity {
 
+    @Getter @Setter
+    @Column(nullable = false)
+    private boolean archived = false;
+
     @Getter
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -37,10 +41,10 @@ public class TeamEntity extends BaseEntity {
     @Getter @Setter
     @Column(nullable = false, unique = true, length = 50)
     private String name;
-//TODO revoir la taille des equipes
+
     @Getter @Setter
     @Column(nullable = false)
-    private Integer teamSize = 5;
+    private Integer teamSize = 2;
 
     @Getter @Setter
     @Column(nullable = false)
@@ -48,7 +52,7 @@ public class TeamEntity extends BaseEntity {
 
     @Getter @Setter
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "captain_id", nullable = false)
+    @JoinColumn(name = "captain_id")
     private UserEntity captain;
 
     @Getter
