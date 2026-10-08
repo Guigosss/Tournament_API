@@ -50,6 +50,9 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found"));
 
+        if (user.isDeleted()) {
+            throw new UserNotFoundException("User not found");
+        }
         if(!passwordEncoder.matches(password, user.getPassword())){
             throw new UserInvalidPasswordException("Invalid password for user " + username);
         }
@@ -61,12 +64,14 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         return userRepository.findByUsername(username)
+                .filter(user -> !user.isDeleted())
                 .orElseThrow(() -> new UsernameNotFoundException("User with username " + username + " not found"));
     }
 
     @Override
     public UserEntity findById(Integer id) {
         return userRepository.findWithRoleById(id)
+                .filter(user -> !user.isDeleted())
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 }

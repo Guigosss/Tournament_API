@@ -21,6 +21,17 @@ public class ProfilController {
 
     private final ProfilService profilService;
 
+    @GetMapping("/players/search")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<java.util.List<ProfilResponse>> search(
+            @org.springframework.web.bind.annotation.RequestParam String username) {
+        java.util.List<ProfilResponse> results = new java.util.ArrayList<>();
+        for (UserEntity user : profilService.search(username)) {
+            results.add(ProfilResponse.fromUserEntity(user));
+        }
+        return ResponseEntity.ok(results);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ProfilResponse> findById(
             @PathVariable Integer id

@@ -27,6 +27,15 @@ public class AuthController {
 
     private final AuthService authService;
     private final JwtUtils jwtUtils;
+    private final com.technofuturtic.tournament_api.bll.services.LogoutService logoutService;
+
+    @PostMapping("/logout")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> logout(
+            @org.springframework.security.core.annotation.AuthenticationPrincipal UserContext user) {
+        logoutService.logout(user.id());
+        return ResponseEntity.noContent().build();
+    }
 
     @RateLimit(maxRequests = 3, windowSeconds = 60)
     @PreAuthorize("isAnonymous()")
@@ -69,6 +78,10 @@ public class AuthController {
         UserContext userContext = jwtUtils.getUser(request.refreshToken());
 
         UserEntity user = authService.findById(userContext.id());
+
+        if (!jwtUtils.matchesTokenVersion(request.refreshToken(), user)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh token has been revoked");
+        }
 
         String newAccessToken = jwtUtils.generateToken(user);
 

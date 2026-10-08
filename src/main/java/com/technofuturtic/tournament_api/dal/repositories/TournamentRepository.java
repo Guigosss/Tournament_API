@@ -12,4 +12,5 @@ public interface TournamentRepository extends JpaRepository<TournamentEntity, In
 
     List<TournamentEntity> findByStatus(TournamentStatus status);
 
+    boolean existsByIdAndOrganizer_Id(Integer tournamentId, Integer organizerId);
 }

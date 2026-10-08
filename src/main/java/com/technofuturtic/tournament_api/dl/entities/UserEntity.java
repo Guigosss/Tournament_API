@@ -27,6 +27,19 @@ import lombok.Setter;
 @EqualsAndHashCode(callSuper = false, exclude = {"password"}) @ToString(exclude =  {"password"})
 public class UserEntity extends BaseEntity implements UserDetails {
 
+    @Getter @Setter
+    @Column(nullable = false)
+    private long tokenVersion = 0;
+
+    @Getter @Setter
+    @Column(nullable = false)
+    private boolean deleted = false;
+
+    @Override
+    public boolean isEnabled() {
+        return !deleted;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.getName()));
@@ -70,5 +83,10 @@ public class UserEntity extends BaseEntity implements UserDetails {
     public UserEntity(String username,String email, String password, RoleEntity role) {
         this(username,email, password);
         this.role = role;
+    }
+
+    public UserEntity(Integer id, String username, String email, String password, RoleEntity role) {
+        this(username, email, password, role);
+        this.id = id;
     }
 }

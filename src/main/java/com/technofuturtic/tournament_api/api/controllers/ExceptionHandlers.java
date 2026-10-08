@@ -24,6 +24,12 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class ExceptionHandlers {
 
+    @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
+    public ResponseEntity<?> handleResponseStatus(org.springframework.web.server.ResponseStatusException ex) {
+        return ResponseEntity.status(ex.getStatusCode()).body(java.util.Map.of("error",
+                ex.getReason() == null ? "Request failed" : ex.getReason()));
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<?> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", "Data conflicts with an existing username, email, team name, membership or linked resource"));
