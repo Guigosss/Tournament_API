@@ -25,7 +25,9 @@ public class RoundGenerator {
 
             case ELIMINATION -> generateElimination(phase, participantCount);
 
-            case GROUP_STAGE, LOSERS_BRACKET -> List.of(); // TODO
+            case GROUP_STAGE -> List.of(); // TODO
+
+            case LOSERS_BRACKET -> List.of(); // TODO
         };
 
         return roundRepository.saveAll(rounds);
