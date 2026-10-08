@@ -6,6 +6,7 @@ import com.technofuturtic.tournament_api.dl.enums.TournamentFormat;
 import com.technofuturtic.tournament_api.dl.enums.TournamentStatus;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public record TournamentResponse(
         Integer id,
@@ -31,4 +32,5 @@ public record TournamentResponse(
                 t.getOrganizer().getId(), t.getOrganizer().getUsername()
         );
     }
+
 }

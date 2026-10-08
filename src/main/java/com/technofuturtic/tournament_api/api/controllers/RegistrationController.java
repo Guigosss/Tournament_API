@@ -2,18 +2,16 @@ package com.technofuturtic.tournament_api.api.controllers;
 
 import com.technofuturtic.tournament_api.api.models.tournament.requests.PlayerRegistrationRequest;
 import com.technofuturtic.tournament_api.api.models.tournament.requests.TeamRegistrationRequest;
+import com.technofuturtic.tournament_api.api.models.tournament.responses.RegistrationCheckResponse;
 import com.technofuturtic.tournament_api.api.models.tournament.responses.RegistrationResponse;
 import com.technofuturtic.tournament_api.bll.services.RegistrationService;
+import com.technofuturtic.tournament_api.dl.enums.RegistrationStatus;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/tournaments/{tournamentId}/registrations")
@@ -100,5 +98,29 @@ public class RegistrationController {
             @PathVariable Integer teamId
     ) {
         return ResponseEntity.ok(registrationService.excludeTeam(tournamentId, teamId));
+    }
+
+    //TODO Vérifier que c'est bien l'organisateur
+    //Liste des inscriptions d'un tournament, filtrable par statut
+    @GetMapping
+    public ResponseEntity<List<RegistrationResponse>> getRegistrations(
+            @PathVariable Integer tournamentId,
+            @RequestParam(required = false) RegistrationStatus status
+    ) {
+        return ResponseEntity.ok(registrationService.getRegistrations(tournamentId, status));
+    }
+
+    //Savoir si un player est inscrit à un tournament
+    @GetMapping("/players/{userId}")
+    public ResponseEntity<RegistrationCheckResponse> checkPlayer(@PathVariable Integer tournamentId,
+                                                                 @PathVariable Integer userId) {
+        return ResponseEntity.ok(registrationService.checkPlayerRegistration(tournamentId, userId));
+    }
+
+    //Savoir si une team est inscrite à un tournament
+    @GetMapping("/teams/{teamId}")
+    public ResponseEntity<RegistrationCheckResponse> checkTeam(@PathVariable Integer tournamentId,
+                                                               @PathVariable Integer teamId) {
+        return ResponseEntity.ok(registrationService.checkTeamRegistration(tournamentId, teamId));
     }
 }

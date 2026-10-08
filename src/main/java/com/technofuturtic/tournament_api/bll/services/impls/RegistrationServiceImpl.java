@@ -1,5 +1,6 @@
 package com.technofuturtic.tournament_api.bll.services.impls;
 
+import com.technofuturtic.tournament_api.api.models.tournament.responses.RegistrationCheckResponse;
 import com.technofuturtic.tournament_api.api.models.tournament.responses.RegistrationResponse;
 import com.technofuturtic.tournament_api.bll.exceptions.registration.RegistrationNotFoundException;
 import com.technofuturtic.tournament_api.bll.exceptions.team.TeamNotFoundException;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -310,5 +312,59 @@ public class RegistrationServiceImpl implements RegistrationService {
         registration.setStatus(RegistrationStatus.EXCLUDED);
 
         return RegistrationResponse.fromTeamRegistration(registerTeamRepository.save(registration));
+    }
+
+    //Liste des inscriptions d'un tournament, filtrable par statut
+    @Override
+    @Transactional(readOnly = true)
+    public List<RegistrationResponse> getRegistrations(Integer tournamentId, RegistrationStatus status) {
+        TournamentEntity tournament = tournamentRepository.findById(tournamentId)
+                .orElseThrow(() -> new TournamentNotFoundException("Tournament non trouvé, Id : " + tournamentId));
+
+        if (tournament.getParticipantType() == ParticipantType.PLAYER) {
+            List<RegisterUserEntity> registrations = (status == null)
+                    ? registerUserRepository.findByTournamentId(tournamentId)
+                    : registerUserRepository.findByTournamentIdAndStatus(tournamentId, status);
+
+            return registrations.stream()
+                    .map(RegistrationResponse::fromUserRegistration)
+                    .toList();
+        }
+
+        List<RegisterTeamEntity> registrations = (status == null)
+                ? registerTeamRepository.findByTournamentId(tournamentId)
+                : registerTeamRepository.findByTournamentIdAndStatus(tournamentId, status);
+
+        return registrations.stream()
+                .map(RegistrationResponse::fromTeamRegistration)
+                .toList();
+    }
+
+    //Savoir si un player est inscrit à un tournament, et avec quel statut
+    @Override
+    @Transactional(readOnly = true)
+    public RegistrationCheckResponse checkPlayerRegistration(Integer tournamentId, Integer userId) {
+        if (!tournamentRepository.existsById(tournamentId)) {
+            throw new TournamentNotFoundException("Tournament non trouvé, Id : " + tournamentId);
+        }
+
+        return registerUserRepository
+                .findByUserIdAndTournamentId(userId, tournamentId)
+                .map(r -> new RegistrationCheckResponse(true, r.getStatus()))
+                .orElse(new RegistrationCheckResponse(false, null));
+    }
+
+    //Savoir si une team est inscrite à un tournament, et avec quel statut
+    @Override
+    @Transactional(readOnly = true)
+    public RegistrationCheckResponse checkTeamRegistration(Integer tournamentId, Integer teamId) {
+        if (!tournamentRepository.existsById(tournamentId)) {
+            throw new TournamentNotFoundException("Tournament non trouvé, Id : " + tournamentId);
+        }
+
+        return registerTeamRepository
+                .findByTeamIdAndTournamentId(teamId, tournamentId)
+                .map(r -> new RegistrationCheckResponse(true, r.getStatus()))
+                .orElse(new RegistrationCheckResponse(false, null));
     }
 }
