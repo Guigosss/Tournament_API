@@ -1,7 +1,10 @@
 package com.technofuturtic.tournament_api.api.controllers;
 
+import com.technofuturtic.tournament_api.api.models.tournament.requests.OrganizerTransferRequest;
+import com.technofuturtic.tournament_api.api.models.tournament.requests.TournamentUpdateRequest;
 import com.technofuturtic.tournament_api.api.models.tournament.responses.PhaseResponse;
 import com.technofuturtic.tournament_api.api.models.tournament.responses.TournamentBracketResponse;
+import com.technofuturtic.tournament_api.api.models.tournament.responses.TournamentDetailResponse;
 import com.technofuturtic.tournament_api.bll.services.TournamentEngineService;
 import com.technofuturtic.tournament_api.bll.services.TournamentGenerationService;
 import com.technofuturtic.tournament_api.api.models.tournament.requests.TournamentRequest;
@@ -43,12 +46,12 @@ public class TournamentController {
         return ResponseEntity.ok(created);
     }
 
-    //Information d'un tournament par Id
+    //Information d'un tournament par Id, avec ses participants
     @GetMapping("/{id}")
-    public ResponseEntity<TournamentResponse> getById(
+    public ResponseEntity<TournamentDetailResponse> getById(
             @PathVariable Integer id
     ) {
-        return ResponseEntity.ok(tournamentService.getById(id));
+        return ResponseEntity.ok(tournamentService.getDetail(id));
     }
 
     //Liste de tous les tournaments
@@ -64,7 +67,7 @@ public class TournamentController {
     public ResponseEntity<TournamentResponse> update(
             @PathVariable Integer id,
             @Valid
-            @RequestBody TournamentRequest request
+            @RequestBody TournamentUpdateRequest request
     ) {
         return ResponseEntity.ok(tournamentService.update(id, request));
     }
@@ -107,4 +110,16 @@ public class TournamentController {
     public ResponseEntity<List<PhaseResponse>> getPhases(@PathVariable Integer tournamentId) {
         return ResponseEntity.ok(tournamentGenerationService.getPhases(tournamentId));
     }
+
+    //TODO Vérifier que c'est bien l'organisateur actuel
+    //Transférer l'organisation d'un tournament
+    @PatchMapping("/{id}/organizer")
+    public ResponseEntity<TournamentResponse> changeOrganizer(
+            @PathVariable Integer id,
+            @Valid
+            @RequestBody OrganizerTransferRequest request
+    ) {
+        return ResponseEntity.ok(tournamentService.changeOrganizer(id, request.newOrganizerId()));
+    }
+
 }

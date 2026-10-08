@@ -11,7 +11,11 @@ import java.util.List;
 public interface ParticipantRepository extends JpaRepository<ParticipantEntity, Integer> {
 
     List<ParticipantEntity> findByTournamentId(Integer tournamentId);
+
     Optional<ParticipantEntity> findByUserIdAndTournamentId(Integer userId, Integer tournamentId);
+
     Optional<ParticipantEntity> findByTeamIdAndTournamentId(Integer teamId, Integer tournamentId);
+
+    Optional<ParticipantEntity> findByIdAndTournamentId(Integer id, Integer tournamentId);
 
 }

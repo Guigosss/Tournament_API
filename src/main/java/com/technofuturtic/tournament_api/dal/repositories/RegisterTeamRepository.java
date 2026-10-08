@@ -20,4 +20,5 @@ public interface RegisterTeamRepository extends JpaRepository<RegisterTeamEntity
     long countByTournamentIdAndStatus(Integer tournamentId, RegistrationStatus status);
 
     Optional<RegisterTeamEntity> findByTeamIdAndTournamentId(Integer teamId, Integer tournamentId);
-}
+
+    List<RegisterTeamEntity> findByTournamentIdAndStatus(Integer tournamentId, RegistrationStatus status);}
