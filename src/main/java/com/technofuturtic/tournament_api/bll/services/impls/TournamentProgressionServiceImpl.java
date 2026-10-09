@@ -10,6 +10,8 @@ import com.technofuturtic.tournament_api.dl.enums.MatchStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class TournamentProgressionServiceImpl implements TournamentProgressionService {
@@ -22,26 +24,31 @@ public class TournamentProgressionServiceImpl implements TournamentProgressionSe
 
         RoundEntity currentRound = match.getRound();
 
-        RoundEntity nextRound = roundRepository.findByPhaseIdAndOrderIndex(currentRound.getPhase().getId(), currentRound.getOrderIndex() + 1).orElse(null);
+        //- Final: no next round
+        Optional<RoundEntity> nextRoundOpt = roundRepository.findByPhaseIdAndOrderIndex(currentRound.getPhase().getId(), currentRound.getOrderIndex() + 1);
 
-        //- Every two matches feed into the same match of the next round
-        //- Matches 1-2 -> match 1, Matches 3-4 -> match 2, etc.
-        int currentOrderIndex = (match.getOrderIndex() + 1) / 2;
+        if (nextRoundOpt.isPresent()) {
+            RoundEntity nextRound = nextRoundOpt.get();
 
-        MatchEntity nextMatch = matchRepository.findByRoundIdAndOrderIndex(nextRound.getId(), currentOrderIndex).orElseThrow(MatchNotFoundException::new);
+            //- Every two matches feed into the same match of the next round
+            //- Matches 1-2 -> match 1, Matches 3-4 -> match 2, etc.
+            int currentOrderIndex = (match.getOrderIndex() + 1) / 2;
 
-        //- Participant position in the next match
-        if (match.getOrderIndex() % 2 == 1) {
-            nextMatch.setParticipant1(match.getWinner());
-        } else {
-            nextMatch.setParticipant2(match.getWinner());
+            MatchEntity nextMatch = matchRepository.findByRoundIdAndOrderIndex(nextRound.getId(), currentOrderIndex).orElseThrow(MatchNotFoundException::new);
+
+            //- Participant position in the next match
+            if (match.getOrderIndex() % 2 == 1) {
+                nextMatch.setParticipant1(match.getWinner());
+            } else {
+                nextMatch.setParticipant2(match.getWinner());
+            }
+
+            if (nextMatch.getParticipant1() != null && nextMatch.getParticipant2() != null) {
+                nextMatch.setStatus(MatchStatus.PENDING);
+            }
+
+            matchRepository.save(nextMatch);
         }
-
-        if (nextMatch.getParticipant1() != null && nextMatch.getParticipant2() != null) {
-            nextMatch.setStatus(MatchStatus.PENDING);
-        }
-
-        matchRepository.save(nextMatch);
 
     }
 }
