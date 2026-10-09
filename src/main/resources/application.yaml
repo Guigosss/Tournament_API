@@ -29,7 +29,27 @@ spring:
     type: redis
     redis:
       time-to-live: 900000
+  mail:
+    host: ${MAIL_HOST:smtp-relay.brevo.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
 jwt:
   secret: ${JWT_SECRET}
   accessTokenValidity: 900
   refreshTokenValidity: 604800
+app:
+  public-base-url: ${APP_BASE_URL:http://localhost:8080}
+  mail:
+    from: ${MAIL_FROM:}
+
