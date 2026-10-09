@@ -119,7 +119,7 @@ class TournamentServiceTest {
                                             LocalDate registrationStart, LocalDate registrationEnd) {
         return new TournamentRequest("Tournoi de printemps", "Premier tournoi de la saison", 8,
                 TournamentFormat.SINGLE_ELIMINATION, ParticipantType.PLAYER,
-                start, end, registrationStart, registrationEnd, 99);
+                start, end, registrationStart, registrationEnd);
     }
 
     private TournamentUpdateRequest updateRequest(int max, ParticipantType type) {
@@ -131,7 +131,7 @@ class TournamentServiceTest {
                                                   LocalDate start, LocalDate end,
                                                   LocalDate registrationStart, LocalDate registrationEnd) {
         return new TournamentUpdateRequest("Nouveau nom", "Nouvelle description", max,
-                TournamentFormat.ROUND_ROBIN, type, start, end, registrationStart, registrationEnd);
+                TournamentFormat.GROUPS_THEN_PLAYOFF, type, start, end, registrationStart, registrationEnd);
     }
 
     //Simule l'utilisateur connecté, tel que le JwtFilter le placerait dans le contexte de sécurité
@@ -529,7 +529,7 @@ class TournamentServiceTest {
             assertThat(tournament.getName()).isEqualTo("Nouveau nom");
             assertThat(tournament.getDescription()).isEqualTo("Nouvelle description");
             assertThat(tournament.getMaxParticipants()).isEqualTo(10);
-            assertThat(tournament.getFormat()).isEqualTo(TournamentFormat.ROUND_ROBIN);
+            assertThat(tournament.getFormat()).isEqualTo(TournamentFormat.GROUPS_THEN_PLAYOFF);
             assertThat(tournament.getParticipantType()).isEqualTo(ParticipantType.PLAYER);
             assertThat(tournament.getStartDate()).isEqualTo(LocalDate.of(2026, 12, 1));
             assertThat(tournament.getEndDate()).isEqualTo(LocalDate.of(2026, 12, 2));
