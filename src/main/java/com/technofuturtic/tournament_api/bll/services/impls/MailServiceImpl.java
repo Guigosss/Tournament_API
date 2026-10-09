@@ -20,30 +20,26 @@ public class MailServiceImpl implements MailService {
     private String mailFrom;
 
     @Override
-    public void envoyerMailGagnant(
-            String email,
-            String nomGagnant,
-            String nomTournoi
-    ) {
+    public void sendWinnerEmail(String email, String winnerName, String tournamentName) {
         try {
-            // Création du message
+            //- Create message
             MimeMessage message = mailSender.createMimeMessage();
 
             MimeMessageHelper helper =
                     new MimeMessageHelper(message, false, "UTF-8");
 
-            // Expéditeur
+            //- Sender
             helper.setFrom(mailFrom);
 
-            // Destinataire
+            //- Recipient
             helper.setTo(email);
 
-            // Objet
+            //- Subject
             helper.setSubject(
-                    "🏆 Félicitations ! Vous avez remporté " + nomTournoi
+                    "🏆 Félicitations ! Vous avez remporté " + winnerName
             );
 
-            // Contenu du mail
+            //- Body
             String contenu = """
                     Félicitations %s ! 🏆
 
@@ -57,20 +53,15 @@ public class MailServiceImpl implements MailService {
                     À bientôt pour une nouvelle compétition !
 
                     L'équipe Tournoi
-                    """.formatted(nomGagnant, nomTournoi);
+                    """.formatted(winnerName, tournamentName);
 
             helper.setText(contenu);
 
-            // Envoi via Brevo
+            //- Send via Brevo
             mailSender.send(message);
 
         } catch (MessagingException | MailException e) {
-
-            throw new IllegalStateException(
-                    "Erreur lors de l'envoi de l'email au gagnant : "
-                            + e.getMessage(),
-                    e
-            );
+            throw new IllegalStateException("Erreur lors de l'envoi de l'email au gagnant : " + e.getMessage(), e);
         }
     }
 }

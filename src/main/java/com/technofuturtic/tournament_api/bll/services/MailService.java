@@ -4,9 +4,5 @@ import org.springframework.messaging.MessagingException;
 
 public interface MailService {
 
-    void envoyerMailGagnant(
-            String email,
-            String nomGagnant,
-            String nomTournoi
-    ) throws MessagingException;
+    void sendWinnerEmail(String email, String winnerName, String tournamentName) throws MessagingException;
 }
