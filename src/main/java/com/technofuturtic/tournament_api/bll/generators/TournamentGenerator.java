@@ -1,5 +1,6 @@
 package com.technofuturtic.tournament_api.bll.generators;
 
+import com.technofuturtic.tournament_api.bll.exceptions.engine.generator.MatchGeneratorNotFoundException;
 import com.technofuturtic.tournament_api.bll.exceptions.engine.tournament.TournamentMustHaveParticipantsException;
 import com.technofuturtic.tournament_api.bll.exceptions.engine.tournament.TournamentNotFoundException;
 import com.technofuturtic.tournament_api.bll.exceptions.engine.tournament.TournamentNotReadyToStartException;
@@ -10,12 +11,12 @@ import com.technofuturtic.tournament_api.dl.entities.TournamentEntity;
 import com.technofuturtic.tournament_api.dl.entities.ParticipantEntity;
 import com.technofuturtic.tournament_api.dl.entities.PhaseEntity;
 import com.technofuturtic.tournament_api.dl.entities.RoundEntity;
+import com.technofuturtic.tournament_api.dl.enums.PhaseType;
 import com.technofuturtic.tournament_api.dl.enums.TournamentStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -27,7 +28,7 @@ public class TournamentGenerator {
 
     private final PhaseGenerator phaseGenerator;
     private final RoundGenerator roundGenerator;
-    private final EliminationBracketGenerator phaseMatchGenerator;
+    private final List<MatchGenerator> matchGenerators;
 
     @Transactional
     public void generate(Integer tournamentId)  {
@@ -39,14 +40,12 @@ public class TournamentGenerator {
         //- Generate Phases
         List<PhaseEntity> phases = phaseGenerator.generate(tournament);
 
-        //- Generate Rounds
-        List<RoundEntity> rounds = new ArrayList<>();
+        //- Generate Rounds and Matches
         for (PhaseEntity phase : phases) {
-            rounds.addAll(roundGenerator.generate(phase, participants.size()));
+            List<RoundEntity> rounds = roundGenerator.generate(phase, participants.size());
+            MatchGenerator generator = getGenerator(phase.getType());
+            generator.generate(rounds, participants);
         }
-
-        //- Generate All Matches
-        phaseMatchGenerator.generate(rounds, participants);
 
         tournament.setStatus(TournamentStatus.IN_PROGRESS);
         tournamentRepository.save(tournament);
@@ -75,4 +74,10 @@ public class TournamentGenerator {
         return participantRepository.findByTournamentId(tournamentId);
     }
 
+    private MatchGenerator getGenerator(PhaseType phaseType) {
+        return matchGenerators.stream()
+                .filter(generator -> generator.supportedType() == phaseType)
+                .findFirst()
+                .orElseThrow(MatchGeneratorNotFoundException::new);
+    }
 }

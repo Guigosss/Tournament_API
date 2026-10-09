@@ -88,6 +88,10 @@ public record ParticipantResponse(
 ) {
 
     public static ParticipantResponse fromEntity(ParticipantEntity participant) {
+        if (participant == null) {
+            return null;
+        }
+
         return new ParticipantResponse(
                 participant.getId(),
                 participant.getTournament().getId(),
