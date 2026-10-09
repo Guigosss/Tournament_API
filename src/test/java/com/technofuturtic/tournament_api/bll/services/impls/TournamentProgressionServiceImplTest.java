@@ -163,13 +163,7 @@ class TournamentProgressionServiceImplTest {
         verify(matchRepository, never()).save(any());
     }
 
-    /**
-     * Cas de la finale : il n'y a pas de round suivant. Avec le code actuel, nextRound vaut null
-     * et {@code nextRound.getId()} lève une NullPointerException.
-     * Test désactivé : à activer une fois le comportement voulu décidé (ne rien faire, par exemple).
-     */
     @Test
-    @Disabled("Bug connu : NPE sur la finale (nextRound == null)")
     @DisplayName("progress : pas de round suivant (finale) -> ne fait rien")
     void progress_noNextRound_doesNothing() {
         MatchEntity match = currentMatch(1);
