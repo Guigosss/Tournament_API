@@ -7,11 +7,11 @@ import java.time.LocalDate;
 
 public record MatchResponse(
         Integer id,
-        ParticipantResponse participant1,
-        ParticipantResponse participant2,
+        BracketParticipantResponse participant1,
+        BracketParticipantResponse participant2,
         Integer score1,
         Integer score2,
-        ParticipantResponse winner,
+        BracketParticipantResponse winner,
         MatchStatus status,
         Integer orderIndex,
         LocalDate scheduledDate
@@ -20,12 +20,12 @@ public record MatchResponse(
     public static MatchResponse fromEntity(MatchEntity match) {
         return new MatchResponse(
                 match.getId(),
-                ParticipantResponse.fromEntity(match.getParticipant1()),
-                ParticipantResponse.fromEntity(match.getParticipant2()),
+                BracketParticipantResponse.fromEntity(match.getParticipant1()),
+                BracketParticipantResponse.fromEntity(match.getParticipant2()),
                 match.getScore1(),
                 match.getScore2(),
                 match.getWinner() != null
-                        ? ParticipantResponse.fromEntity(match.getWinner())
+                        ? BracketParticipantResponse.fromEntity(match.getWinner())
                         : null,
                 match.getStatus(),
                 match.getOrderIndex(),

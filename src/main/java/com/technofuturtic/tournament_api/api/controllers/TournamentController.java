@@ -2,13 +2,15 @@ package com.technofuturtic.tournament_api.api.controllers;
 
 import com.technofuturtic.tournament_api.api.models.tournament.requests.OrganizerTransferRequest;
 import com.technofuturtic.tournament_api.api.models.tournament.requests.TournamentUpdateRequest;
-import com.technofuturtic.tournament_api.api.models.tournament.responses.PhaseResponse;
-import com.technofuturtic.tournament_api.api.models.tournament.responses.TournamentBracketResponse;
+import com.technofuturtic.tournament_api.api.models.tournament.responses.TournamentResponse;
 import com.technofuturtic.tournament_api.api.models.tournament.responses.TournamentDetailResponse;
+import com.technofuturtic.tournament_api.api.models.tournament.responses.TournamentBracketResponse;
+import com.technofuturtic.tournament_api.api.models.tournament.responses.PhaseResponse;
+import com.technofuturtic.tournament_api.api.models.tournament.responses.ParticipantRankingResponse;
+import com.technofuturtic.tournament_api.bll.services.RankingService;
 import com.technofuturtic.tournament_api.bll.services.TournamentEngineService;
 import com.technofuturtic.tournament_api.bll.services.TournamentGenerationService;
 import com.technofuturtic.tournament_api.api.models.tournament.requests.TournamentRequest;
-import com.technofuturtic.tournament_api.api.models.tournament.responses.TournamentResponse;
 import com.technofuturtic.tournament_api.bll.services.TournamentService;
 import com.technofuturtic.tournament_api.dl.enums.TournamentStatus;
 import jakarta.validation.Valid;
@@ -36,6 +38,7 @@ public class TournamentController {
     private final TournamentService tournamentService;
     private final TournamentEngineService tournamentEngineService;
     private final TournamentGenerationService tournamentGenerationService;
+    private final RankingService rankingService;
 
     //Création d'un tournament
     @PostMapping
@@ -125,4 +128,8 @@ public class TournamentController {
         return ResponseEntity.ok(tournamentService.changeOrganizer(id, request.newOrganizerId()));
     }
 
+    @GetMapping("/{tournamentId}/ranking")
+    public ResponseEntity<List<ParticipantRankingResponse>> getRanking(@PathVariable Integer tournamentId) {
+        return ResponseEntity.ok(rankingService.getRanking(tournamentId));
+    }
 }

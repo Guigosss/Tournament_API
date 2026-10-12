@@ -26,7 +26,12 @@ public interface MatchRepository extends JpaRepository<MatchEntity, Integer> {
         """)
     List<MatchEntity> findByTournamentPhaseAndRound(@Param("tournamentId") Integer tournamentId, @Param("phaseId") Integer phaseId, @Param("roundId") Integer roundId);
 
+    //- The match at a given position in a round
     Optional<MatchEntity> findByRoundIdAndOrderIndex(Integer roundId, Integer orderIndex);
 
+    //- Matches of a round with given status
     List<MatchEntity> findByRoundIdAndStatus(Integer roundId, MatchStatus status);
+
+    //- All matches of a tournament
+    List<MatchEntity> findByRoundPhaseTournamentId(Integer tournamentId);
 }
