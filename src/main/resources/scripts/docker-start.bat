@@ -1,1 +1,2 @@
 docker run --name tournament-postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=Test1234 -e POSTGRES_DB=tournament -p 5435:5432 -d postgres
+docker run -d --name tournament-redis -p 6379:6379 redis:7

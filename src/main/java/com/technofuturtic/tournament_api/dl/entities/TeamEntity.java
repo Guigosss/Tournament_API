@@ -10,7 +10,10 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.JoinTable;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -27,27 +30,45 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = false) @ToString
 public class TeamEntity extends BaseEntity {
 
+    @Getter @Setter
+    @Column(nullable = false)
+    private boolean archived = false;
+
     @Getter
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Getter @Setter
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true, length = 50)
     private String name;
 
     @Getter @Setter
-    private Integer numberOfWins;
+    @Column(nullable = false)
+    private Integer teamSize = 2;
+
+    @Getter @Setter
+    @Column(nullable = false)
+    private Integer numberOfWins = 0;
 
     @Getter @Setter
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "captain_id", nullable = false)
+    @JoinColumn(name = "captain_id")
     private UserEntity captain;
 
+    @Getter
     @ManyToMany
     @JoinTable(
             name = "team_member",
             joinColumns = @JoinColumn(name = "team_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
+            inverseJoinColumns = @JoinColumn(name = "user_id", nullable = false),
+            uniqueConstraints = @UniqueConstraint(name = "uk_team_member_pair", columnNames = {"team_id", "user_id"})
     )
     private Set<UserEntity> members = new HashSet<>();
+
+    public TeamEntity(@NotBlank(message = "Team name is required") @Size(max = 50, message = "Team name max 50 chars") String name) {
+    }
+
+    public void addMember(UserEntity user) {
+        members.add(java.util.Objects.requireNonNull(user));
+    }
 }

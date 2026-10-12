@@ -1,5 +1,6 @@
 package com.technofuturtic.tournament_api.dl.entities;
 
+import com.technofuturtic.tournament_api.dl.enums.RoundType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
@@ -9,6 +10,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -27,8 +30,9 @@ public class RoundEntity {
     private Integer id;
 
     @Getter @Setter
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String name;
+    private RoundType type;
 
     @Getter @Setter
     @Column(nullable = false)

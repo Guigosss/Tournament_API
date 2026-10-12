@@ -1,14 +1,19 @@
 package com.technofuturtic.tournament_api.dl.entities;
 
+import com.technofuturtic.tournament_api.dl.enums.TournamentFormat;
+import com.technofuturtic.tournament_api.dl.enums.TournamentStatus;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
+import com.technofuturtic.tournament_api.dl.enums.ParticipantType;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -41,16 +46,26 @@ public class TournamentEntity extends BaseEntity {
     private Integer maxParticipants;
 
     @Getter @Setter
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String format; //- Enum
+    private TournamentFormat format;
 
     @Getter @Setter
     @Column(nullable = false)
-    private String status; //- Enum
+    @Enumerated(EnumType.STRING)
+    private TournamentStatus status;
+
+    @Getter @Setter
+    @Enumerated(EnumType.STRING)
+    private ParticipantType participantType;
 
     @Getter @Setter
     @Column(nullable = false)
     private LocalDate startDate;
+
+    @Getter @Setter
+    @Column(nullable = false)
+    private LocalDate endDate;
 
     @Getter @Setter
     @Column(nullable = false)

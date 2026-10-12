@@ -8,14 +8,19 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.UniqueConstraint;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-@Table(name = "paticipant")
+@Table(name = "participant", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"tournament_id", "user_id"}),
+        @UniqueConstraint(columnNames = {"tournament_id", "team_id"})
+    })
 @NoArgsConstructor @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false) @ToString
 public class ParticipantEntity {
@@ -24,14 +29,17 @@ public class ParticipantEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Getter @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tournament_id", nullable = false)
     private TournamentEntity tournament;
 
+    @Getter @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
+    @Getter @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
     private TeamEntity team;

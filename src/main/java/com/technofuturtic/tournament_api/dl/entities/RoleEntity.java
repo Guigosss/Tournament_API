@@ -26,4 +26,8 @@ public class RoleEntity {
     @Getter @Setter
     @Column(nullable = false, unique = true)
     private String name;
+
+    public RoleEntity(String name){
+        this.name=name;
+    }
 }
