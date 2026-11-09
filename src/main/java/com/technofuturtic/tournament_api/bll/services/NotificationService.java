@@ -6,7 +6,20 @@ import com.technofuturtic.tournament_api.dl.enums.NotificationType;
 import java.util.List;
 
 public interface NotificationService {
-    void notify(UserEntity recipient, NotificationType type, Integer teamId, String message);
+    void notifyInvitation(
+            UserEntity recipient,
+            Integer teamId,
+            Integer invitationId,
+            String message
+    );
+    void notify(
+            UserEntity recipient,
+            NotificationType type,
+            Integer teamId,
+            String message
+    );
     List<NotificationResponse> findMine(Integer userId);
+
     NotificationResponse markRead(Integer notificationId, Integer userId);
+
 }

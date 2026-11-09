@@ -43,3 +43,4 @@ CREATE INDEX idx_team_join_request_team ON team_join_request (team_id);
 
 ALTER TABLE user_ ADD COLUMN token_version BIGINT NOT NULL DEFAULT 0;
 ALTER TABLE team ADD COLUMN archived BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE notification ADD COLUMN invitation_id INTEGER;

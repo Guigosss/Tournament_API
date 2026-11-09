@@ -21,6 +21,22 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     @Transactional
+    public void notifyInvitation(
+            UserEntity recipient,
+            Integer teamId,
+            Integer invitationId,
+            String message
+    ) {
+        NotificationEntity notification = new NotificationEntity();
+
+        notification.setRecipient(recipient);
+        notification.setType(NotificationType.TEAM_INVITATION);
+        notification.setTeamId(teamId);
+        notification.setInvitationId(invitationId);
+        notification.setMessage(message);
+
+        notificationRepository.saveAndFlush(notification);
+    }
     public void notify(UserEntity recipient, NotificationType type, Integer teamId, String message) {
         NotificationEntity notification = new NotificationEntity();
         notification.setRecipient(recipient);

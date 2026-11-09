@@ -1,5 +1,6 @@
 package com.technofuturtic.tournament_api.api.configs;
 
+import com.technofuturtic.tournament_api.dl.entities.UserEntity;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,10 +24,10 @@ public class RedisConfig {
             ObjectMapper objectMapper
     ) {
 
-        JacksonJsonRedisSerializer<Object> jsonSerializer =
+        JacksonJsonRedisSerializer<UserEntity> jsonSerializer =
                 new JacksonJsonRedisSerializer<>(
                         objectMapper,
-                        Object.class
+                        UserEntity.class
                 );
 
         RedisCacheConfiguration config =

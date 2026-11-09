@@ -14,6 +14,7 @@ import org.springframework.security.access.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import com.technofuturtic.tournament_api.bll.services.NotificationService;
 
 @Service
 @RequiredArgsConstructor
@@ -21,27 +22,54 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
     private final TeamInvitationRepository invitationRepository;
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
+
 
     @Override
     @Transactional
-    public TeamInvitationResponse invite(Integer teamId, Integer playerId, Integer senderId, boolean admin) {
+    public TeamInvitationResponse invite(
+            Integer teamId,
+            Integer playerId,
+            Integer senderId,
+            boolean admin
+    ) {
         UserEntity player = userRepository.findByIdForUpdate(playerId)
                 .orElseThrow(() -> new UserNotFoundException("Player not found"));
-        if (player.isDeleted()) throw new UserNotFoundException("Player not found");
+
+        if (player.isDeleted()) {
+            throw new UserNotFoundException("Player not found");
+        }
+
         TeamEntity team = teamRepository.findByIdForUpdate(teamId)
                 .orElseThrow(() -> new TeamNotFoundException("Team not found"));
+
         if (!admin && (team.getCaptain() == null || !senderId.equals(team.getCaptain().getId()))) {
             throw new AccessDeniedException("Only the captain or an administrator can invite players");
         }
+
         checkMembershipAndCapacity(team, playerId);
-        if (invitationRepository.existsByTeamIdAndPlayerIdAndStatus(teamId, playerId, InvitationStatus.PENDING)) {
+
+        if (invitationRepository.existsByTeamIdAndPlayerIdAndStatus(
+                teamId, playerId, InvitationStatus.PENDING)) {
             throw new TeamConflictException("invitation", "A pending invitation already exists");
         }
+
         TeamInvitationEntity invitation = new TeamInvitationEntity();
         invitation.setTeam(team);
         invitation.setPlayer(player);
-        return TeamInvitationResponse.fromInvitation(invitationRepository.saveAndFlush(invitation));
+
+        TeamInvitationEntity savedInvitation = invitationRepository.saveAndFlush(invitation);
+
+        notificationService.notifyInvitation(
+                player,
+                team.getId(),
+                savedInvitation.getId(),
+                "Vous avez reçu une invitation à rejoindre l'équipe " + team.getName() + "."
+        );
+
+        return TeamInvitationResponse.fromInvitation(savedInvitation);
     }
+
 
     @Override
     @Transactional(readOnly = true)

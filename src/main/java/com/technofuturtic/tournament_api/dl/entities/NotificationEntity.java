@@ -24,6 +24,8 @@ public class NotificationEntity extends BaseEntity {
 
     private Integer teamId;
 
+    private Integer invitationId;
+
     @Column(nullable = false, length = 1000)
     private String message;
 

@@ -1,5 +1,5 @@
 package com.technofuturtic.tournament_api.dl.enums;
 
 public enum NotificationType {
-    MEMBER_REMOVED, MEMBER_LEFT
+    MEMBER_REMOVED, MEMBER_LEFT, TEAM_INVITATION;
 }
