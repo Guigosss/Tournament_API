@@ -177,3 +177,21 @@ WHERE name IN (
                'Team Rocio - Jerome',
                'Team Younes - Julien'
     );
+
+INSERT INTO register_user (user_id, tournament_id, register_date, status)
+SELECT p.user_id, p.tournament_id, CURRENT_TIMESTAMP, 'VALIDATED'
+FROM participant p
+WHERE p.user_id IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM register_user r
+    WHERE r.user_id = p.user_id AND r.tournament_id = p.tournament_id
+);
+
+INSERT INTO register_team (team_id, tournament_id, register_date, status)
+SELECT p.team_id, p.tournament_id, CURRENT_TIMESTAMP, 'VALIDATED'
+FROM participant p
+WHERE p.team_id IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM register_team r
+    WHERE r.team_id = p.team_id AND r.tournament_id = p.tournament_id
+);
