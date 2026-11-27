@@ -2,12 +2,14 @@ package com.technofuturtic.tournament_api.bll.services.impls;
 
 import com.technofuturtic.tournament_api.bll.exceptions.team.TeamConflictException;
 import com.technofuturtic.tournament_api.bll.exceptions.user.UserNotFoundException;
+import com.technofuturtic.tournament_api.bll.services.NotificationService;
 import com.technofuturtic.tournament_api.dal.repositories.TeamJoinRequestRepository;
 import com.technofuturtic.tournament_api.dal.repositories.TeamRepository;
 import com.technofuturtic.tournament_api.dal.repositories.UserRepository;
 import com.technofuturtic.tournament_api.dl.entities.TeamEntity;
 import com.technofuturtic.tournament_api.dl.entities.TeamJoinRequestEntity;
 import com.technofuturtic.tournament_api.dl.enums.InvitationStatus;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.server.ResponseStatusException;
@@ -28,7 +30,8 @@ class TeamJoinRequestServiceImplTest {
     private final TeamJoinRequestRepository requests = mock(TeamJoinRequestRepository.class);
     private final TeamRepository teams = mock(TeamRepository.class);
     private final UserRepository users = mock(UserRepository.class);
-    private final TeamJoinRequestServiceImpl service = new TeamJoinRequestServiceImpl(requests, teams, users);
+    private final NotificationService notifications = mock(NotificationService.class);
+    private final TeamJoinRequestServiceImpl service = new TeamJoinRequestServiceImpl(requests, teams, users, notifications);
 
     private TeamEntity prepareTeam() {
         var team = team(7, player(1));
@@ -120,6 +123,7 @@ class TeamJoinRequestServiceImplTest {
         assertThrows(TeamConflictException.class, () -> service.accept(8, 1, false));
     }
 
+    @Disabled("Règle supprimée sur main (commit 1abf809) : plus de limite de taille d'équipe. À confirmer puis supprimer ou adapter.")
     @Test void fullTeamCannotReceiveOrAcceptRequest() {
         var team = prepareTeam();
         var request = prepareRequest(team);

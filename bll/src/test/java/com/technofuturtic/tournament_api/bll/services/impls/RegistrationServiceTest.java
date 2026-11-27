@@ -108,10 +108,11 @@ class RegistrationServiceTest {
     private TeamEntity team(Integer id, String name, int teamSize, int memberCount) {
         TeamEntity team = new TeamEntity();
         team.setName(name);
-        team.setTeamSize(teamSize);
         for (int i = 0; i < memberCount; i++) {
             team.getMembers().add(user(100 + i, "member" + i));
         }
+        //- teamSize n'a plus de setter (calculé par addMember) : forcé pour tester les cas incohérents
+        ReflectionTestUtils.setField(team, "teamSize", teamSize);
         return withId(team, id);
     }
 

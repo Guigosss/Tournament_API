@@ -6,7 +6,6 @@ import com.technofuturtic.tournament_api.bll.models.team.requests.TeamUpdateRequ
 import com.technofuturtic.tournament_api.api.models.team.responses.TeamResponse;
 import com.technofuturtic.tournament_api.api.models.team.responses.TeamSearchResponse;
 import java.util.List;
-import java.util.ArrayList;
 import com.technofuturtic.tournament_api.bll.services.TeamService;
 import com.technofuturtic.tournament_api.dl.entities.TeamEntity;
 import jakarta.validation.Valid;
@@ -35,12 +34,33 @@ public class TeamController {
     @GetMapping("/search")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<TeamSearchResponse>> search(
-            @RequestParam String name) {
-        List<TeamSearchResponse> results = new ArrayList<>();
-        for (TeamEntity team : teamService.search(name)) {
-            results.add(new TeamSearchResponse(team.getId(), team.getName(), team.isArchived()));
-        }
+            @RequestParam(required = false) String name
+    ) {
+        List<TeamSearchResponse> results = teamService.search(name)
+                .stream()
+                .map(team -> new TeamSearchResponse(
+                        team.getId(),
+                        team.getName(),
+                        team.getNumberOfWins(),
+                        team.getMembers().size(),
+                        team.isArchived()
+                ))
+                .toList();
+
         return ResponseEntity.ok(results);
+    }
+
+    @GetMapping("/mine")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<TeamResponse>> findMine(
+            @AuthenticationPrincipal UserContext user
+    ) {
+        List<TeamResponse> teams = teamService.findMine(user.id())
+                .stream()
+                .map(TeamResponse::fromTeam)
+                .toList();
+
+        return ResponseEntity.ok(teams);
     }
 
     @GetMapping("/{teamId}")

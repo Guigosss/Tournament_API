@@ -7,6 +7,7 @@ import com.technofuturtic.tournament_api.bll.exceptions.user.UserNotFoundExcepti
 import com.technofuturtic.tournament_api.dal.repositories.TeamRepository;
 import com.technofuturtic.tournament_api.dal.repositories.UserRepository;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.Optional;
@@ -66,14 +67,20 @@ class TeamServiceImplTest {
 
     @Test void searchTrimsInputAndReturnsRepositoryResults() {
         var results = List.of(team(7, player(1)));
-        when(teams.findTop20ByNameContainingIgnoreCaseOrderByNameAsc("dra")).thenReturn(results);
+        when(teams.searchAvailableTeams("dra", PageRequest.of(0, 20))).thenReturn(results);
         assertSame(results, service.search(" dra "));
     }
 
-    @Test void invalidSearchDoesNotQueryDatabase() {
-        for (String query : new String[]{null, "", " ", "x".repeat(51)}) {
-            assertEquals(400, assertThrows(ResponseStatusException.class, () -> service.search(query)).getStatusCode().value());
+    @Test void blankSearchListsAvailableTeams() {
+        var results = List.of(team(7, player(1)));
+        when(teams.searchAvailableTeams(null, PageRequest.of(0, 20))).thenReturn(results);
+        for (String query : new String[]{null, "", " "}) {
+            assertSame(results, service.search(query));
         }
+    }
+
+    @Test void tooLongSearchDoesNotQueryDatabase() {
+        assertEquals(400, assertThrows(ResponseStatusException.class, () -> service.search("x".repeat(51))).getStatusCode().value());
         verifyNoInteractions(teams);
     }
 

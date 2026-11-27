@@ -1,4 +1,10 @@
 spring:
+  flyway:
+    enabled: true
+    default-schema: public
+    schemas: public
+    create-schemas: true
+
   application:
     name: tournament_api
 

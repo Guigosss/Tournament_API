@@ -10,6 +10,7 @@ import com.technofuturtic.tournament_api.dal.repositories.UserRepository;
 import com.technofuturtic.tournament_api.dl.entities.TeamEntity;
 import com.technofuturtic.tournament_api.dl.entities.TeamInvitationEntity;
 import com.technofuturtic.tournament_api.dl.enums.InvitationStatus;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.AccessDeniedException;
 import java.util.List;
@@ -85,6 +86,7 @@ class TeamInvitationServiceImplTest {
         verify(teams, never()).saveAndFlush(any());
     }
 
+    @Disabled("Règle supprimée sur main (commit 1abf809) : plus de limite de taille d'équipe. À confirmer puis supprimer ou adapter.")
     @Test void fullTeamRejectsInvitationAndAcceptance() {
         var team = prepareTeam();
         var invitation = prepareInvitation(team);

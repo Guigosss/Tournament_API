@@ -50,20 +50,23 @@ public class TeamMemberServiceImpl implements TeamMemberService {
 
     private UserEntity removeMember(TeamEntity team, Integer playerId) {
         if (team.getCaptain() != null && playerId.equals(team.getCaptain().getId())) {
-            throw new TeamConflictException("captainId", "Transfer captaincy before removing or leaving as captain");
+            throw new TeamConflictException(
+                    "captainId",
+                    "Transfer captaincy before removing or leaving as captain"
+            );
         }
-        UserEntity selectedMember = null;
-        for (UserEntity member : team.getMembers()) {
-            if (playerId.equals(member.getId())) {
-                selectedMember = member;
-                break;
-            }
-        }
-        if (selectedMember == null) {
-            throw new UserNotFoundException("Player is not a member of this team");
-        }
-        team.getMembers().remove(selectedMember);
+
+        UserEntity selectedMember = team.getMembers().stream()
+                .filter(member -> playerId.equals(member.getId()))
+                .findFirst()
+                .orElseThrow(() ->
+                        new UserNotFoundException("Player is not a member of this team")
+                );
+
+        team.removeMember(selectedMember);
+
         teamRepository.saveAndFlush(team);
+
         return selectedMember;
     }
 }

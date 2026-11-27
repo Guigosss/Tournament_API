@@ -38,6 +38,26 @@ public class NotificationServiceImpl implements NotificationService {
 
         notificationRepository.saveAndFlush(notification);
     }
+
+    @Override
+    @Transactional
+    public void notifyJoinRequest(
+            UserEntity recipient,
+            Integer teamId,
+            Integer joinRequestId,
+            String message
+    ) {
+        NotificationEntity notification = new NotificationEntity();
+
+        notification.setRecipient(recipient);
+        notification.setType(NotificationType.TEAM_JOIN_REQUEST);
+        notification.setTeamId(teamId);
+        notification.setJoinRequestId(joinRequestId);
+        notification.setMessage(message);
+
+        notificationRepository.saveAndFlush(notification);
+    }
+
     public void notify(UserEntity recipient, NotificationType type, Integer teamId, String message) {
         NotificationEntity notification = new NotificationEntity();
         notification.setRecipient(recipient);
