@@ -12,6 +12,14 @@ public interface NotificationService {
             Integer invitationId,
             String message
     );
+
+    void notifyJoinRequest(
+            UserEntity recipient,
+            Integer teamId,
+            Integer joinRequestId,
+            String message
+    );
+
     void notify(
             UserEntity recipient,
             NotificationType type,

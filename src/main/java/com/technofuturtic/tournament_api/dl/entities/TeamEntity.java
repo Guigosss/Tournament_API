@@ -22,6 +22,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -42,9 +43,9 @@ public class TeamEntity extends BaseEntity {
     @Column(nullable = false, unique = true, length = 50)
     private String name;
 
-    @Getter @Setter
+    @Getter
     @Column(nullable = false)
-    private Integer teamSize = 2;
+    private Integer teamSize = 0;
 
     @Getter @Setter
     @Column(nullable = false)
@@ -65,10 +66,25 @@ public class TeamEntity extends BaseEntity {
     )
     private Set<UserEntity> members = new HashSet<>();
 
-    public TeamEntity(@NotBlank(message = "Team name is required") @Size(max = 50, message = "Team name max 50 chars") String name) {
+    public TeamEntity(@NotBlank(message = "Team name is required")
+                      @Size(max = 50, message = "Team name max 50 chars") String name) {
+        this.name = name;
     }
 
     public void addMember(UserEntity user) {
-        members.add(java.util.Objects.requireNonNull(user));
+        if (members.add(Objects.requireNonNull(user))) {
+            teamSize = members.size();
+        }
+    }
+
+    public void removeMember(UserEntity user) {
+        if (members.remove(user)) {
+            teamSize = members.size();
+        }
+    }
+
+    public void clearMembers() {
+        members.clear();
+        teamSize = 0;
     }
 }

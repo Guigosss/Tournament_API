@@ -47,7 +47,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
             throw new AccessDeniedException("Only the captain or an administrator can invite players");
         }
 
-        checkMembershipAndCapacity(team, playerId);
+        checkMembership(team, playerId);
 
         if (invitationRepository.existsByTeamIdAndPlayerIdAndStatus(
                 teamId, playerId, InvitationStatus.PENDING)) {
@@ -100,7 +100,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
         if (invitation.getStatus() != InvitationStatus.PENDING) {
             throw new TeamConflictException("invitation", "Invitation is no longer pending");
         }
-        checkMembershipAndCapacity(team, playerId);
+        checkMembership(team, playerId);
         team.addMember(invitation.getPlayer());
         teamRepository.saveAndFlush(team);
         invitation.setStatus(InvitationStatus.ACCEPTED);
@@ -109,7 +109,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
         return TeamInvitationResponse.fromInvitation(invitation);
     }
 
-    private void checkMembershipAndCapacity(TeamEntity team, Integer playerId) {
+    private void checkMembership(TeamEntity team, Integer playerId) {
         if (team.isArchived() || team.getCaptain() == null) {
             throw new TeamConflictException("team", "Cette équipe ne peut plus recruter de membres.");
         }
@@ -117,9 +117,6 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
             if (playerId.equals(member.getId())) {
                 throw new TeamConflictException("player", "Player is already a member of the team");
             }
-        }
-        if (team.getMembers().size() >= team.getTeamSize()) {
-            throw new TeamConflictException("team", "Team is full");
         }
     }
 

@@ -11,6 +11,10 @@ import com.technofuturtic.tournament_api.dl.entities.TeamEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -21,12 +25,28 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     @Transactional(readOnly = true)
-    public java.util.List<TeamEntity> search(String name) {
-        if (name == null || name.isBlank() || name.strip().length() > 50) {
-            throw new org.springframework.web.server.ResponseStatusException(
-                    org.springframework.http.HttpStatus.BAD_REQUEST, "Le nom recherché doit contenir entre 1 et 50 caractères.");
+    public List<TeamEntity> search(String name) {
+
+        String searchName = (name == null || name.isBlank())
+                ? null
+                : name.strip();
+
+        if (searchName != null && searchName.length() > 50) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Le nom recherché ne peut pas dépasser 50 caractères."
+            );
         }
-        return teamRepository.findTop20ByNameContainingIgnoreCaseOrderByNameAsc(name.strip());
+
+        return teamRepository.searchAvailableTeams(
+                searchName,
+                PageRequest.of(0, 20)
+        );
+    }
+
+    @Override
+    public List<TeamEntity> findMine(Integer userId) {
+        return teamRepository.findAllByPlayerId(userId);
     }
 
     @Override
@@ -122,7 +142,7 @@ public class TeamServiceImpl implements TeamService {
                                 "Team not found, Id : " + id
                         ));
 
-        team.getMembers().clear();
+        team.clearMembers();
         team.setCaptain(null);
         team.setArchived(true);
         teamRepository.saveAndFlush(team);

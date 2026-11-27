@@ -2,14 +2,15 @@ package com.technofuturtic.tournament_api.api.models.notification;
 
 import com.technofuturtic.tournament_api.dl.entities.NotificationEntity;
 import com.technofuturtic.tournament_api.dl.enums.NotificationType;
-import java.time.LocalDateTime;
 
+import java.time.LocalDateTime;
 
 public record NotificationResponse(
         Integer id,
         NotificationType type,
         Integer teamId,
         Integer invitationId,
+        Integer joinRequestId,
         String message,
         LocalDateTime createdAt,
         boolean read,
@@ -21,6 +22,7 @@ public record NotificationResponse(
                 notification.getType(),
                 notification.getTeamId(),
                 notification.getInvitationId(),
+                notification.getJoinRequestId(),
                 notification.getMessage(),
                 notification.getCreatedAt(),
                 notification.getReadAt() != null,

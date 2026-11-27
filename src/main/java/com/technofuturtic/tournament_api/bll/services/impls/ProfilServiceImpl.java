@@ -112,7 +112,9 @@ public class ProfilServiceImpl implements ProfilService {
                     break;
                 }
             }
-            if (memberToRemove != null) team.getMembers().remove(memberToRemove);
+            if (memberToRemove != null) {
+                team.removeMember(memberToRemove);
+            }
             if (team.getCaptain() != null && id.equals(team.getCaptain().getId())) {
                 team.setCaptain(null);
             }
